@@ -1,0 +1,24 @@
+<ion-view view-title="添加员工">
+  <ion-content class="padding">
+    <form>
+      <div class="list">
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">ID</span>
+		    <input type="number" placeholder=1 ng-model="employee.id">
+		  </label>
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">姓名</span>
+		    <input type="text" placeholder="王彦彬" ng-model="employee.name">
+		  </label>
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">电话</span>
+            <input type="text" placeholder="132XXXXXXXXXX" ng-model="employee.tel">
+          </label>
+	   </div>
+	   <div class="padding">
+	       <button class="button button-positive button-block" ng-click="addEmployee(employee)">确定</button>
+	       <button class="button button-positive button-block" ng-click="clearEmployee(employee)">清除</button>
+	   </div>
+    </form>
+  </ion-content>
+</ion-view>

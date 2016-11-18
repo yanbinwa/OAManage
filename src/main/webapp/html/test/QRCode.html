@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="../lib/jquery/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="../lib/jquery/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+	function onBoard()
+	{
+		$('#code').qrcode("http://www.helloweba.com");
+	}
+</script>
+</head>
+<body onload="onBoard()">
+    <div id="code"></div>
+</body>
+</html>

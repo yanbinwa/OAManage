@@ -1,0 +1,8 @@
+create table employee (
+   id INT NOT NULL,
+   storeId  INT,
+   leaderId  INT,
+   name  VARCHAR(40) NOT NULL,
+   tel   VARCHAR(40) NOT NULL,
+   PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

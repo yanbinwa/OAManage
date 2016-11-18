@@ -1,0 +1,28 @@
+<ion-view view-title="门店信息">
+  <ion-content class="padding">
+    <form>
+       <div class="list">
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">ID</span>
+            <input type="number" placeholder={{storeInfo.id}} ng-model="storeInfo.id" ng-disabled="true">
+          </label>
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">店名</span>
+            <input type="text" placeholder={{storeInfo.name}} ng-model="storeInfo.name" ng-disabled="isDisableEdit()">
+          </label>
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">地址</span>
+            <input type="text" placeholder={{storeInfo.address}}  ng-model="storeInfo.address" ng-disabled="isDisableEdit()">
+          </label>
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">电话</span>
+            <input type="text" placeholder={{storeInfo.tel}}  ng-model="storeInfo.tel" ng-disabled="isDisableEdit()">
+          </label>
+       </div>
+       <div class="padding">
+           <button class="button button-positive button-block" ng-click="changeEditTag()">{{changeEditButtonName}}</button>
+           <button class="button button-positive button-block" ng-disabled="isDisableEdit()" ng-click="updataStoreInfo(storeInfo)">更新</button>
+       </div>
+    </form>
+  </ion-content>
+</ion-view>

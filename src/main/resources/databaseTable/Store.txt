@@ -1,0 +1,10 @@
+create table store (
+   id INT NOT NULL,
+   name  VARCHAR(40) NOT NULL,
+   address VARCHAR(100) NOT NULL,
+   tel   VARCHAR(40) NOT NULL,
+   PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+INSERT INTO store (id, name, address, tel) VALUES(1, "CISCO", "上海市徐汇区宜山路926号新思大楼", "13222085556");

@@ -1,0 +1,35 @@
+<ion-view view-title="添加员工">
+  <ion-content class="padding">
+    <form>
+      <div class="list">
+		  <div class="item item-input block">
+		    <span class="input-label">ID</span>
+		    <div class="item-input" display="inline-block">
+		      <input type="text" placeholder="{{employeeTemplete.id}}" ng-model="employee.id">
+		      <button class="button button-light icon-right ion-android-search" ng-click="getEmployeeById(employee)"></button>
+		    </div>
+		  </div>
+		  <label class="item item-input item-stacked-label">
+		    <span class="input-label">姓名</span>
+		    <input type="text" placeholder="{{employeeTemplete.name}}" ng-model="employee.name">
+		  </label>
+		  <label class="item item-input item-stacked-label">
+            <span class="input-label">所属上级</span>
+            <input type="text" placeholder={{employeeTemplete.leaderName}} ng-model="employee.leaderName">
+          </label>
+		  <label class="item item-input item-stacked-label">
+            <span class="input-label">所属门店</span>
+            <input type="text" placeholder={{employeeTemplete.storeName}} ng-model="employee.storeName">
+          </label>
+          <label class="item item-input item-stacked-label">
+            <span class="input-label">电话</span>
+            <input type="text" placeholder={{employeeTemplete.tel}} ng-model="employee.tel">
+          </label>
+	   </div>
+	   <div class="padding">
+	       <button class="button button-positive button-block" ng-click="addEmployee(employee)">确定</button>
+	       <button class="button button-positive button-block" ng-click="clearEmployee(employee)">清除</button>
+	   </div>
+    </form>
+  </ion-content>
+</ion-view>
