@@ -64,8 +64,8 @@ public class EmployeeControllerClient
     }
     
     public static void main(String args[])
-    {
-        Employee employee = new Employee(2, "王彦彬", "13222085556");
+    {   
+        Employee employee = new Employee(2, "王彦彬", "男", 1479814082794L, 27, "13222085556", "140109198912211039", 1);
         EmployeeControllerClient.newEmployee(employee);
         EmployeeControllerClient.findEmployeeById(2);
         EmployeeControllerClient.listAllEmployee();

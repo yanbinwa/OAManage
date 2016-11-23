@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html ng-app="mgcrea.ngStrapDocs">
+
+  <head>
+    <meta charset="utf-8" />
+    <title>AngularJS Plunker</title>
+    <script>document.write('<base href="' + document.location + '" />');</script>
+    <link rel="stylesheet" href="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/css/libs.min.css">
+    <link rel="stylesheet" href="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/css/docs.min.css">
+    <link rel="stylesheet" href="style.css" />
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/ionic/js/angular/angular.min.js" ></script>
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/ionic/js/angular/angular-animate.min.js"></script>
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/ionic/js/angular/angular-sanitize.min.js"></script>
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/angular-strap.min.js"></script>
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/angular-strap.tpl.min.js"></script>
+    <script src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/angular-strap.docs.tpl.min.js"></script>
+    <script src="app.js"></script>
+    <script src="app1.js"></script>
+  </head>
+
+  <body ng-controller="MainCtrl">
+
+<div>
+
+<div class="bs-docs-section" ng-controller="DatepickerDemoCtrl">
+
+  <pre class="bs-example-scope">$scope.selectedDate = {{selectedDate}}; // &lt;- {{ getType('selectedDate') }}
+$scope.selectedDateAsNumber = {{selectedDateAsNumber}}; // &lt;- {{ getType('selectedDateAsNumber') }}
+$scope.fromDate = {{fromDate}}; // &lt;- {{ getType('fromDate') }}
+$scope.untilDate = {{untilDate}}; // &lt;- {{ getType('untilDate') }}
+</pre>
+  <input type="text" class="form-control" ng-model="selectedDate" name="date" bs-datepicker>
+
+</div>
+</div>
+  </body>
+
+</html>

@@ -1,0 +1,10 @@
+create table user (
+   id TINYINT NOT NULL,
+   name  VARCHAR(20) NOT NULL,
+   password   VARCHAR(10) NOT NULL, 
+   userType   TINYINT  NOT NULL,
+   authType   TINYINT  NOT NULL,
+   userState  TINYINT  NOT NULL,
+   userId     TINYINT  NOT NULL,
+   PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

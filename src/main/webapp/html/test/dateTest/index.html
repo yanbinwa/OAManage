@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AngularJS fix datetimepicker</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/css/bootstrap-datepicker.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min.js"></script>
+    <script type="text/javascript" src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/moment.js"></script>
+</head>
+<body ng-app="App">
+    <div class="container" ng-controller="IndexController">
+        <h4>AngularJS ng-model value not change on select different day</h4>
+        <div class="form-group">
+	        <div class='input-group date' datetimepicker  ng-model="date">
+		        <input type='text' class="form-control" />
+		        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+		        </span>
+	        </div>
+            <br/>
+            <p>
+                ng-model value: {{date}}
+        </div>
+        
+        <div class="form-group">
+            <div class='input-group date' datepicker ng-model="date1">
+                <input type='text' class="form-control" />
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+            <br/>
+            <p>
+                ng-model value: {{date1}}
+        </div>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="bootstrap-datetimepicker-3.1.3.js"></script>
+    <script type="text/javascript" src="/Users/yanbinwa/Documents/workspace/OAManage/src/main/webapp/lib/jquery/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</body>
+</html>

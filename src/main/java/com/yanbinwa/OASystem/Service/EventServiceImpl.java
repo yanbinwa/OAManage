@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yanbinwa.OASystem.Common.EventListener;
-import com.yanbinwa.OASystem.Model.Event;
+import com.yanbinwa.OASystem.Event.Event;
 
 @Service("eventService")
 public class EventServiceImpl implements EventService
@@ -93,8 +93,8 @@ public class EventServiceImpl implements EventService
                 continue;
             }
             logger.info(event);
-            String key = event.getName();
-            Set<EventListener> listenerSet = keyToListener.get(key);
+            String target = event.getTarget();
+            Set<EventListener> listenerSet = keyToListener.get(target);
             if(listenerSet == null)
             {
                 return;

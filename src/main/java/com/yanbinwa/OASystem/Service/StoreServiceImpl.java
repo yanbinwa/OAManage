@@ -43,5 +43,12 @@ public class StoreServiceImpl implements StoreService
         // TODO Auto-generated method stub
         dao.deleteStore(store);
     }
+
+    @Override
+    public Store vailadeAndGetStoreFromPayLoad(Object storeObj)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
     
 }

@@ -1,8 +1,13 @@
 create table employee (
-   id INT NOT NULL,
+   id TINYINT NOT NULL,
+   name  VARCHAR(20) NOT NULL,
+   sex   VARCHAR(10) NOT NULL,
+   birthday   BIGINT  NOT NULL, 
+   age       TINYINT  NOT NULL, 
+   tel   VARCHAR(20) NOT NULL,
+   identityId  VARCHAR(20) NOT NULL,
    storeId  INT,
-   leaderId  INT,
-   name  VARCHAR(40) NOT NULL,
-   tel   VARCHAR(40) NOT NULL,
    PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+insert into EMPLOYEE (id, NAME, SEX, BIRTHDAY, AGE, TEL, IDENTITYID, STOREID) values (1, "王彦彬", "男", 1479814082794L, 27, "13222085556", "140109198912211039", 1)

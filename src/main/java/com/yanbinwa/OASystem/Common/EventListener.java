@@ -1,6 +1,6 @@
 package com.yanbinwa.OASystem.Common;
 
-import com.yanbinwa.OASystem.Model.Event;
+import com.yanbinwa.OASystem.Event.Event;
 
 public interface EventListener
 {

@@ -12,9 +12,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.yanbinwa.OASystem.Common.EventListener;
+import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.Message.MessageHttpMethod;
-import com.yanbinwa.OASystem.Model.Event;
 import com.yanbinwa.OASystem.Session.Session;
 
 import net.sf.json.JSONObject;
@@ -44,7 +44,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     @PostConstruct
     public void init()
     {
-        String[] keys = {"wyb"};
+        String[] keys = {"MessageServiceSpring"};
         eventService.register(this, keys);
     }
     
@@ -87,10 +87,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         {
             
         }
-        
-        
-        Event event = new Event("wyb", 26);
-        eventService.sendMessage(event);
+
     }
 
     private void handleMessageOnClose(WebSocketSession session)

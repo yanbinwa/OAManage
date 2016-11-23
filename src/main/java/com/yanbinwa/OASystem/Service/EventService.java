@@ -1,7 +1,7 @@
 package com.yanbinwa.OASystem.Service;
 
 import com.yanbinwa.OASystem.Common.EventListener;
-import com.yanbinwa.OASystem.Model.Event;
+import com.yanbinwa.OASystem.Event.Event;
 
 public interface EventService
 {

@@ -13,4 +13,6 @@ public interface StoreService
     List<Store> findAllStores();
     
     void deleteStore(Store store);
+    
+    Store vailadeAndGetStoreFromPayLoad(Object storeObj);
 }

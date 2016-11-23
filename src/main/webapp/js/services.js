@@ -50,13 +50,8 @@ angular.module('ionicApp.services', [])
 .factory('Employee', function() {
 	
 	var employeeTemplate = {
-		id: 1,
-		storeId: -1,
-		storeName: "无",
-		leaderId: -1,
-		leaderName: "无",
-		name: '王彦彬',
-		tel: '13222085556'
+		sex: '男',
+	    storeId: -1
 	};
 	
 	var EMPLOYEES_EXPIRE_TIME = 5000;
@@ -68,27 +63,57 @@ angular.module('ionicApp.services', [])
 		},
 		getEmptyEmployee: function() {
 			var emptyTemplate = {
-				id: '',
+				sex: '男',
 				storeId: '',
-				storeName: '',
-				leaderId: '',
-				leaderName: '',
 				name: '',
 				tel: ''
 			};
 			return emptyTemplate;
 		},
 		clearEmployee: function(employee) {
-			employee.id = '';
-			employee.storeId = '';
-			employee.storeName = '';
-			employee.leaderId = '';
-			employee.leaderName = '';
+			employee.storeId = -1;
 			employee.name = '';
+			employee.sex = '';
 			employee.tel = '';
+			employee.ID = '';
 		},
 		getEmployeeExpireTime: function() {
 			return EMPLOYEES_EXPIRE_TIME;
 		}
 	};
+})
+
+.factory('User', function() {
+	var userTemplate = {
+		authType: '普通用户',
+		userType: 'employee'
+	};
+	
+	return {
+		getUserTemplate: function() {
+			var newUser = JSON.parse(JSON.stringify(userTemplate));
+			return newUser;
+		},
+		clearUser: function(user) {
+			user.name = '';
+			user.authType = '普通用户';
+			user.password = '';
+			user.comfirmPassword = '';
+		}
+	}
+})
+
+.factory('DateUtil', function() {
+	return {
+		getTimestampFromDateStr: function(dateStr) {
+			return new Date(dateStr).getTime();
+		},
+		getDateStrFromTimestamp: function(timestamp) {
+			var date = new Date(timestamp);
+			var year = date.getFullYear();
+			var month = date.getUTCMonth();
+			var day = date.getDate();
+			return year + "/" + month + "/" + day;
+		}
+	}
 });

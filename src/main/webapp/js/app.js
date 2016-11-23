@@ -60,7 +60,17 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
           controller: 'UpdataInfoTabCtrl'
         }
       }
+    })
+    .state('login', {
+      url: "/login",
+      templateUrl: "templates/login.html",	
+      controller: 'LoginTabCtrl'
+    })
+    .state('sign', {
+      url: "/sign",
+      templateUrl: "templates/sign.html",	
+      controller: 'SignTabCtrl'
     });
   
-  $urlRouterProvider.otherwise("/app/main/home");
+  $urlRouterProvider.otherwise("/login");
 });
