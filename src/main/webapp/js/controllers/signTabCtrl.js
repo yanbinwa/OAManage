@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('SignTabCtrl', function($scope, $state, User, Employee, DateUtil) {
+.controller('SignTabCtrl', function($scope, $state, User, Employee, DateUtil, WebsocketClient) {
     
     $scope.$on("SignTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
@@ -8,7 +8,7 @@ angular.module('ionicApp.controllers')
 			openTabResponse();
 		}
 		else if(functionKey == 'userSign') {
-			userSignResponse();
+			userSignResponse(msg);
 		}
 	});
     
@@ -131,8 +131,14 @@ angular.module('ionicApp.controllers')
 		sendMsg(data);
     }
     
-    var userSignResponse = function(event) {
-    	
+    var userSignResponse = function(msg) {
+    	var responseCode = msg.responseCode;
+    	if (responseCode != WebsocketClient.getResponseOk()) {
+			alert(msg.responsePayLoad);
+			return;
+		}
+    	alert("您的申请已经成功提交，请等待审核");
+    	$state.go('login');
     }
     
     $('#sign_birthday_input').datepicker({

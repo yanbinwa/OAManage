@@ -42,6 +42,9 @@ angular.module('ionicApp.controllers')
 		else if(index == 4) {
 			responseMsg.routeKey = 'UpdataInfoTabCtrl';
 		}
+		else if(index == 5) {
+			
+		}
 		$scope.$broadcast(responseMsg.routeKey, responseMsg);
 	}
 	

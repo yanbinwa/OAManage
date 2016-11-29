@@ -75,6 +75,16 @@ public class Message
         return this.responsePayLoad;
     }
     
+    public void setRouteKey(String routeKey)
+    {
+        this.routeKey = routeKey;
+    }
+    
+    public void setFunctionKey(String functionKey)
+    {
+        this.functionKey = functionKey;
+    }
+    
     public void setResponsePayLoad(String responsePayLoad)
     {
         this.responsePayLoad = responsePayLoad;

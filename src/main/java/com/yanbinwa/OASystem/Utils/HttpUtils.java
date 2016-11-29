@@ -26,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.yanbinwa.OASystem.Message.HttpResult;
+import com.yanbinwa.OASystem.Message.Message.MessageHttpMethod;
 
 public class HttpUtils
 {
@@ -196,5 +197,33 @@ public class HttpUtils
             con.disconnect();
         }
         return ret;
+    }
+    
+    public static String getHttpMethodStr(MessageHttpMethod method)
+    {
+        if (method == null)
+        {
+            return null;
+        }
+        String methodStr = null;
+        switch(method)
+        {
+        case GET:
+            methodStr = "GET";
+            break;
+            
+        case POST:
+            methodStr = "POST";
+            break;
+            
+        case DEL:
+            methodStr = "DELETE";
+            break;
+            
+        default:
+            break;
+        }
+        
+        return methodStr;
     }
 }

@@ -5,13 +5,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Event implements Serializable
 {
-    private static final long serialVersionUID = 1L;
-    private static AtomicInteger atomicEventId = new AtomicInteger(0);
     
     public enum EventType 
     {
-        EmployeeSign, StoreSign, EmployeeLogin, StoreSignLogin, Order
+        Sign, Login, Order
     }
+    
+    private static final long serialVersionUID = 1L;
+    private static AtomicInteger atomicEventId = new AtomicInteger(0);
     
     int eventId;
     EventType eventType;

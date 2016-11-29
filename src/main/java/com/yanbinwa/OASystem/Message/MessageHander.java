@@ -5,16 +5,24 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.springframework.web.socket.TextMessage;
 
+import com.yanbinwa.OASystem.Service.MessageProcessorService;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 public class MessageHander implements Runnable
 {
-    private static final Logger logger = Logger.getLogger(MessageHander.class);
-    Message message;
+    protected static final Logger logger = Logger.getLogger(MessageHander.class);
+    protected Message message;
+    protected MessageProcessorService messageProcessorService;
     
-    public MessageHander(Message message)
+    public MessageHander(Message message, MessageProcessorService messageProcessorService)
     {
         this.message = message;
+        this.messageProcessorService = messageProcessorService;
+    }
+    
+    public void setMessageServiceSpring(MessageProcessorService messageProcessorService)
+    {
+        this.messageProcessorService = messageProcessorService;
     }
     
     public void handerMessage()
@@ -34,26 +42,15 @@ public class MessageHander implements Runnable
         }
     }
     
-    private void sendMessage()
+    protected void handleHttpResult(HttpResult httpResult)
     {
-        String type = null;
-        switch(message.getMethod())
-        {
-        case GET:
-            type = "GET";
-            break;
-            
-        case POST:
-            type = "POST";
-            break;
-            
-        case DEL:
-            type = "DELETE";
-            break;
-            
-        default:
-            break;
-        }
+        message.setResponsePayLoad(httpResult.getResponse());
+        message.setResponseCode(httpResult.getStateCode());
+    }
+    
+    protected void sendMessage()
+    {
+        String type = HttpUtils.getHttpMethodStr(message.method);
         if(type == null)
         {
             logger.error("Unknown http method");
@@ -63,8 +60,7 @@ public class MessageHander implements Runnable
         String url = message.getUrl() + message.getUrlParameter();
         String payLoad = message.getRequestPayLoad();
         HttpResult ret = HttpUtils.httpRequest(url, payLoad, type);
-        message.setResponsePayLoad(ret.getResponse());
-        message.setResponseCode(ret.getStateCode());
+        handleHttpResult(ret);
     }
     
     @Override

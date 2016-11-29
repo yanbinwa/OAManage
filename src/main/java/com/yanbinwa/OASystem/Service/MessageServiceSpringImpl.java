@@ -1,11 +1,18 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
@@ -15,7 +22,11 @@ import com.yanbinwa.OASystem.Common.EventListener;
 import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.Message.MessageHttpMethod;
+import com.yanbinwa.OASystem.Model.User;
+import com.yanbinwa.OASystem.Model.User.AuthType;
+import com.yanbinwa.OASystem.Model.User.UserType;
 import com.yanbinwa.OASystem.Session.Session;
+import com.yanbinwa.OASystem.Session.Session.SessionType;
 
 import net.sf.json.JSONObject;
 
@@ -29,8 +40,13 @@ import net.sf.json.JSONObject;
 @Transactional
 public class MessageServiceSpringImpl implements MessageServiceSpring, EventListener
 {
-    private static CopyOnWriteArraySet<Session> webSocketSessionSet = new CopyOnWriteArraySet<Session>();
+    private static Map<SessionType, CopyOnWriteArraySet<Session>> sessionTypeToSessionMap = new HashMap<SessionType, CopyOnWriteArraySet<Session>>();
+    private static Map<WebSocketSession, Session> webSocketSessionToSessionMap = new HashMap<WebSocketSession, Session>();
     private static final Logger logger = Logger.getLogger(MessageServiceSpringImpl.class);
+    
+    private BlockingQueue<Message> notifyAdminQueue;
+    private BlockingQueue<Message> notifyNormalQueue;
+    private ThreadPoolTaskExecutor poolTaskExecutor;
         
     @Autowired
     private PropertyService propertyService;
@@ -44,32 +60,78 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     @PostConstruct
     public void init()
     {
-        String[] keys = {"MessageServiceSpring"};
+        String[] keys = {EventService.MESSAGE_SERVICE_SPRING};
         eventService.register(this, keys);
+        CopyOnWriteArraySet<Session> noneAuthorizationSession = new CopyOnWriteArraySet<Session>();
+        CopyOnWriteArraySet<Session> adminStoreSession = new CopyOnWriteArraySet<Session>();
+        CopyOnWriteArraySet<Session> adminEmployeeSession = new CopyOnWriteArraySet<Session>();
+        CopyOnWriteArraySet<Session> normalStoreSession = new CopyOnWriteArraySet<Session>();
+        CopyOnWriteArraySet<Session> normalEmployeeSession = new CopyOnWriteArraySet<Session>();
+        
+        sessionTypeToSessionMap.put(SessionType.NoneAuthorizationSession, noneAuthorizationSession);
+        sessionTypeToSessionMap.put(SessionType.AdminStoreSession, adminStoreSession);
+        sessionTypeToSessionMap.put(SessionType.AdminEmployeeSession, adminEmployeeSession);
+        sessionTypeToSessionMap.put(SessionType.NormalStoreSession, normalStoreSession);
+        sessionTypeToSessionMap.put(SessionType.NormalEmployeeSession, normalEmployeeSession);
+        
+        poolTaskExecutor = new ThreadPoolTaskExecutor();
+        poolTaskExecutor.setQueueCapacity((Integer)propertyService.getProperty(QUEUE_CAPACITY, Integer.class));
+        poolTaskExecutor.setCorePoolSize((Integer)propertyService.getProperty(CORE_POOL_SIZE, Integer.class));  
+        poolTaskExecutor.setMaxPoolSize((Integer)propertyService.getProperty(MAX_POOL_SIZE, Integer.class));  
+        poolTaskExecutor.setKeepAliveSeconds((Integer)propertyService.getProperty(KEEP_ALIVE_SECONDS, Integer.class));
+        poolTaskExecutor.initialize();
+        
+        notifyAdminQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_ADMIN_QUEUE_SIZE, Integer.class));
+        notifyNormalQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_NORMAL_QUEUE_SIZE, Integer.class));
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                // TODO Auto-generated method stub
+                notifyUserAdmin();
+            }
+            
+        }).start();
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                // TODO Auto-generated method stub
+                notifyUserNormal();
+            }
+            
+        }).start();
     }
     
     @Override
-    public void handleMessage(WebSocketSession session, TextMessage message, int type)
+    public void handleMessage(WebSocketSession webSocketSession, TextMessage message, int type)
     {
         // TODO Auto-generated method stub
         if (type == MessageServiceSpring.ONOPEN)
         {
-            handleMessageOnOpen(session);
+            handleMessageOnOpen(webSocketSession);
         }
         else if(type == MessageServiceSpring.ONCLOASE)
         {
-            handleMessageOnClose(session);
+            handleMessageOnClose(webSocketSession);
         }
         else if(type == MessageServiceSpring.ONMESSAGE)
         {
-            handleMessageOnMessage(session, message);
+            handleMessageOnMessage(webSocketSession, message);
         }
     }
 
-    private void handleMessageOnOpen(WebSocketSession session)
+    private void handleMessageOnOpen(WebSocketSession webSocketSession)
     {
         // TODO Auto-generated method stub
-        webSocketSessionSet.add(new Session(session));
+        Session session = new Session(webSocketSession);
+        session.setSessionType(SessionType.NoneAuthorizationSession);
+        sessionTypeToSessionMap.get(SessionType.NoneAuthorizationSession).add(session);
+        webSocketSessionToSessionMap.put(webSocketSession, session);
         logger.info("this is sprint speaking: add a user");
     }
     
@@ -79,37 +141,59 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         logger.info("this is sprint speaking: receive a message " + message.getPayload());
         Session s = getSession(session);
         Message msg = createMessage(s, message.getPayload());
+        
         if (msg != null)
         {
-            messageProcessorService.enqueue(msg);
+            messageProcessorService.enqueueMessage(msg);
         }
         else
         {
-            
+            logger.error("Invaliade websocket input");
         }
 
     }
 
-    private void handleMessageOnClose(WebSocketSession session)
+    private void handleMessageOnClose(WebSocketSession webSocketSession)
     {
         // TODO Auto-generated method stub
-        webSocketSessionSet.remove(new Session(session));
+        Session session = webSocketSessionToSessionMap.remove(webSocketSession);
+        sessionTypeToSessionMap.get(session.getSessionType()).remove(session);
+        try
+        {
+            webSocketSession.close();
+        } 
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+        }
         logger.info("this is sprint speaking: remove a user");
     }
 
     @Override
-    public boolean validateSession(Session session)
+    public boolean validateSession(Session session, Message message)
     {
         // TODO Auto-generated method stub
         if (session == null)
         {
             return false;
         }
-        if (webSocketSessionSet.contains(session))
+        SessionType sessionType = session.getSessionType();
+        if (!sessionTypeToSessionMap.get(sessionType).contains(session))
         {
-            return true;
+            return false;
         }
-        return false;
+        if (sessionType == SessionType.NoneAuthorizationSession)
+        {
+            if (message.getUrl().contains("/login/"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
     }
     
     private Session getSession(WebSocketSession webSocketSession)
@@ -118,14 +202,8 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         {
             return null;
         }
-        for(Session session : webSocketSessionSet)
-        {
-            if(session.getWebSocketSession() == webSocketSession)
-            {
-                return session;
-            }
-        }
-        return null;
+        
+        return webSocketSessionToSessionMap.get(webSocketSession);
     }
     
     private Message createMessage(Session session, String payLoad)
@@ -217,6 +295,146 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     {
         // TODO Auto-generated method stub
         logger.info(event);
+    }
+
+    @Override
+    public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType)
+    {
+        // TODO Auto-generated method stub
+        if (session == null)
+        {
+            return false;
+        }
+        boolean ret = sessionTypeToSessionMap.get(sourceType).remove(session);
+        if (!ret)
+        {
+            return false;
+        }
+        ret = sessionTypeToSessionMap.get(targetType).add(session);
+        if (!ret)
+        {
+            return false;
+        }
+        session.setSessionType(targetType);
+        return true;
+    }
+
+    @Override
+    public boolean isWhatUrl(String urlName, String url)
+    {
+        // TODO Auto-generated method stub
+        String whatUrl = (String) propertyService.getProperty(urlName, String.class);
+        whatUrl = whatUrl.split(":")[1];
+        if (url.contains(whatUrl))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public SessionType getSessionTypeFromUser(User user)
+    {
+        // TODO Auto-generated method stub
+        UserType userType = user.getUserType();
+        AuthType authType = user.getAuthType();
+        if (userType == UserType.Store && authType == AuthType.Admin)
+        {
+            return SessionType.AdminStoreSession;
+        }
+        else if(userType == UserType.Store && authType == AuthType.Normal)
+        {
+            return SessionType.NormalStoreSession;
+        }
+        else if(userType == UserType.Employee && authType == AuthType.Admin)
+        {
+            return SessionType.AdminEmployeeSession;
+        }
+        else if(userType == UserType.Employee && authType == AuthType.Normal)
+        {
+            return SessionType.NormalEmployeeSession;
+        }
+        
+        return null;
+    }
+
+    @Override
+    public boolean notifiyAdminUser(Message message)
+    {
+        // TODO Auto-generated method stub
+        return notifyAdminQueue.add(message);
+    }
+
+    @Override
+    public boolean notifiyNormalUser(Message message)
+    {
+        // TODO Auto-generated method stub
+        return notifyNormalQueue.add(message);
+    }
+    
+    private void notifyUserAdmin()
+    {
+        while(true)
+        {
+            Message message = null;
+            try
+            {
+                message = notifyAdminQueue.poll(1000, TimeUnit.MILLISECONDS);
+            } 
+            catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(message == null)
+            {
+                continue;
+            }
+            NotifyUserHelper notifyUserHelper = new NotifyUserHelper(message);
+            poolTaskExecutor.execute(notifyUserHelper);
+        }
+    }
+    
+    private void notifyUserNormal()
+    {
+        while(true)
+        {
+            Message message = null;
+            try
+            {
+                message = notifyNormalQueue.poll(1000, TimeUnit.MILLISECONDS);
+            } 
+            catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(message == null)
+            {
+                continue;
+            }
+            NotifyUserHelper notifyUserHelper = new NotifyUserHelper(message);
+            poolTaskExecutor.execute(notifyUserHelper);
+        }
+    }
+    
+    class NotifyUserHelper implements Runnable
+    {
+        
+        Message message;
+        
+        public NotifyUserHelper(Message message)
+        {
+            this.message = message;
+        }
+        
+        @Override
+        public void run()
+        {
+            // TODO Auto-generated method stub
+            
+        }
+        
     }
     
 }

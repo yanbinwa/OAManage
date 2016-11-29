@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Service.LoginService;
 
 import net.sf.json.JSONObject;
@@ -28,14 +29,15 @@ public class LoginController
     public static final String LOGIN_ROOT_URL = "/login";
     
     @RequestMapping(value = LOGIN_ROOT_URL + "/userSign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody String userSign(@RequestBody JSONObject payLoad) 
+    public @ResponseBody User userSign(@RequestBody JSONObject payLoad) 
     {
-        boolean ret = loginService.userSign(payLoad);
-        if (!ret)
-        {
-            return "user sign error";
-        }
-        return "";
+        return loginService.userSign(payLoad);
+    }
+    
+    @RequestMapping(value = LOGIN_ROOT_URL + "/userLogin", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody User userLogin(@RequestBody JSONObject payLoad) 
+    {
+        return loginService.userLogin(payLoad);
     }
     
 }

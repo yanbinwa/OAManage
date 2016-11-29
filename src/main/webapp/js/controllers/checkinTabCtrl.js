@@ -15,6 +15,10 @@ angular.module('ionicApp.controllers')
 	});
 
 	$scope.getORCodeKey = function() {
+		getORCodeKey();
+	}
+	
+	var getORCodeKey = function() {
 		var data = {
 			functionKey: 'getORCodeKey',
 			urlName: 'GetORCodeKey',
@@ -49,5 +53,5 @@ angular.module('ionicApp.controllers')
 		$scope.$emit("MainCtrl", msg);
 	}
 	
-	$scope.getORCodeKey();
+	getORCodeKey();
 });

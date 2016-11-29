@@ -68,10 +68,10 @@ public class EventServiceImpl implements EventService
     }
 
     @Override
-    public void sendMessage(Event event)
+    public boolean sendMessage(Event event)
     {
         // TODO Auto-generated method stub
-        messageQueue.add(event);
+        return messageQueue.add(event);
     }
     
     protected void handleEvent()

@@ -2,6 +2,8 @@ package com.yanbinwa.OASystem.Service;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +33,44 @@ public class LoginServiceImpl implements LoginService
     @Autowired
     private StoreService storeService;
     
-    private AtomicInteger atomicUserId = new AtomicInteger(0);
-    private AtomicInteger atomicEmployeeId = new AtomicInteger(0);
+    @Autowired
+    private PropertyService propertyService;
+    
+    private AtomicInteger atomicUserId;
+    private AtomicInteger atomicEmployeeId;
     private AtomicInteger atomicStoreId = new AtomicInteger(0);
+    
+    @PostConstruct
+    public void init()
+    {
+        int userIdBak = (Integer) propertyService.getLocalProperty(LoginService.USER_ID_BAK, Integer.class, 0);
+        atomicUserId = new AtomicInteger(userIdBak);
+        int employeeIdBak = (Integer) propertyService.getLocalProperty(LoginService.EMPLOYEE_ID_BAK, Integer.class, 0);
+        atomicEmployeeId = new AtomicInteger(employeeIdBak);
+        int storeIdBak = (Integer) propertyService.getLocalProperty(LoginService.STORE_ID_BAK, Integer.class, 0);
+        atomicStoreId = new AtomicInteger(storeIdBak);
+    }
+    
+    private int getUserId()
+    {
+        int userId = atomicUserId.getAndIncrement();
+        propertyService.setLocalProperty(LoginService.USER_ID_BAK, userId, Integer.class);
+        return userId;
+    }
+    
+    private int getEmployeeId()
+    {
+        int employeeId = atomicEmployeeId.getAndIncrement();
+        propertyService.setLocalProperty(LoginService.EMPLOYEE_ID_BAK, employeeId, Integer.class);
+        return employeeId;
+    }
+    
+    private int getStoreId()
+    {
+        int storeId = atomicStoreId.getAndIncrement();
+        propertyService.setLocalProperty(LoginService.STORE_ID_BAK, storeId, Integer.class);
+        return storeId;
+    }
     
     private UserType getUserType(String userType)
     {
@@ -83,7 +120,7 @@ public class LoginServiceImpl implements LoginService
         }
         
         user = new User();
-        user.setId(atomicUserId.getAndIncrement());
+        user.setId(getUserId());
         user.setName(username);
         
         String password = userJsonObj.getString(LoginService.USERPASSWORD);
@@ -112,7 +149,7 @@ public class LoginServiceImpl implements LoginService
         {
             return false;
         }
-        employee.setId(atomicEmployeeId.incrementAndGet());
+        employee.setId(getEmployeeId());
         employee.setStoreId(storeId);
         
         user.setUserId(employee.getId());
@@ -134,38 +171,89 @@ public class LoginServiceImpl implements LoginService
         {
             return false;
         }
-        store.setId(atomicStoreId.incrementAndGet());
+        store.setId(getStoreId());
         return false;
     }
 
     @Override
-    public boolean userSign(JSONObject payLoad)
+    public User userSign(JSONObject payLoad)
     {
         // TODO Auto-generated method stub
         if(payLoad == null)
         {
-            return false;
+            return null;
         }
         
         Object userObj = payLoad.get("user");
         User user = getUserFromPayLoad(userObj);
         if (user == null)
         {
-            return false;
+            return null;
         }
+        
+        boolean ret = false;
         if (user.getUserType() == UserType.Employee)
         {
             Object employeeObj = payLoad.get("employee");
             int storeId = payLoad.getInt("storeId");
-            return employeeSign(user, employeeObj, storeId);
+            ret = employeeSign(user, employeeObj, storeId);
         }
         else if(user.getUserType() == UserType.Store)
         {
             Object storeObj = payLoad.get("store");
-            return storeSign(user, storeObj);
+            ret = storeSign(user, storeObj);
         }
         
-        return false;
+        if (ret)
+        {
+            return user;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
+    public User userLogin(JSONObject payLoad)
+    {
+        // TODO Auto-generated method stub
+        String username = payLoad.getString(LoginService.USERNAME);
+        User user = dao.findByName(username);
+        if (user == null)
+        {
+            return null;
+        }
+        
+        String userPassword = payLoad.getString(LoginService.USERPASSWORD);
+        if (!userPassword.equals(user.getPassword()))
+        {
+            return null;
+        }
+        
+        String userTypeStr = payLoad.getString(LoginService.USERTYPE);
+        if (userTypeStr == null)
+        {
+            return null;
+        }
+        UserType userType = getUserType(userTypeStr);
+        if (userType != user.getUserType())
+        {
+            return null;
+        }
+        
+        String authTypeStr = payLoad.getString(LoginService.AUTHTYPE);
+        if (authTypeStr == null)
+        {
+            return null;
+        }
+        AuthType authType = getUserAuth(authTypeStr);
+        if (authType != user.getAuthType())
+        {
+            return null;
+        }
+        
+        return user;
     }
 
 }
