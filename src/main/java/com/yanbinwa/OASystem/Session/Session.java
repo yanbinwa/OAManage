@@ -19,6 +19,7 @@ public class Session
     WebSocketSession webSocketSession;
     User user;
     SessionType sessionType;
+    String sessionId;
     
     public Session(WebSocketSession webSocketSession)
     {
@@ -48,6 +49,16 @@ public class Session
     public SessionType getSessionType()
     {
         return sessionType;
+    }
+    
+    public void setSessionId(String sessionId)
+    {
+        this.sessionId = sessionId;
+    }
+    
+    public String getSessionId()
+    {
+        return sessionId;
     }
     
     @Override

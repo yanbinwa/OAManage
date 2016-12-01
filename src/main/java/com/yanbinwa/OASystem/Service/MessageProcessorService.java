@@ -4,7 +4,6 @@ import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Session.Session;
-import com.yanbinwa.OASystem.Session.Session.SessionType;
 
 public interface MessageProcessorService
 {
@@ -18,9 +17,7 @@ public interface MessageProcessorService
     public static final String EVENT_QUEUE_SIZE = "MessageProcessor_EventQueueSize";
     
     public boolean enqueueMessage(Message message);
-    
-    public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType);
+    public boolean loginSession(Session session, User user);
     public boolean isWhatUrl(String urlName, String url);
-    public SessionType getSessionTypeFromUser(User user);
     public boolean sendEvent(Event event);
 }

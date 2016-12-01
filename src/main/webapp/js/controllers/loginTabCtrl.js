@@ -85,6 +85,7 @@ angular.module('ionicApp.controllers')
 		}
     	var employee = msg.responsePayLoad;
     	UserInfo.setUserInfoEmployee(employee);
+    	UserInfo.saveUserInfo(WebsocketClient.getStorageKey());
     	alert("登陆成功");
     	$state.go('app.main.home');
     }

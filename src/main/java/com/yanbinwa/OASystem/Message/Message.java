@@ -11,12 +11,13 @@ public class Message implements JsonPersist
 {
     public enum MessageHttpMethod 
     {
-        GET, POST, DEL
+        GET, POST, DEL, WEBSOCKET
     }
     
     public static final String METHOD_GET_KEY = "GET";
     public static final String METHOD_POST_KEY = "POST";
     public static final String METHOD_DEL_KEY = "DEL";
+    public static final String METHOD_WEBSOCKET = "WEBSOCKET";
     
     String routeKey;
     String functionKey;

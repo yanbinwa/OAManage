@@ -6,17 +6,44 @@ angular.module('ionicApp.services', [])
 	var SERVER_URL = "wss://localhost:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
+	var INVALIDATE_SESSIONID = -1;
+	var STORAGE_KEY = "OAManage";
 	
 	var session = new Object();
 	session.client = null;
 	session.connected = false;
+	session.connecting = false;
+	session.id = INVALIDATE_SESSIONID;
 
-	if ('WebSocket' in window) {
-		session.client = new WebSocket(SERVER_URL);
+	var loadSessionId = function(key) {
+		session.id = window.localStorage[key + "sessionId"];
+		if (session.id == null) {
+			session.id = INVALIDATE_SESSIONID;
+		}
+		return session.id;
 	}
-
+	
 	return {
-		getSession: function() {
+		getSession: function(onOpen, onClose, onMessage) {
+			if ('WebSocket' in window) {
+				session.client = new WebSocket(SERVER_URL);
+				if (session.client != null) {
+					session.client.onopen = function(event) {
+						onOpen();
+					}
+					session.client.onclose = function() {
+						onClose();
+					}
+					session.client.onmessage = function() {
+						onMessage(event);
+					}
+					session.connecting = true;
+					loadSessionId(STORAGE_KEY);
+				}
+			}
+			else {
+				alert("The browser is not support websocket");
+			}
 			return session;
 		},
 		getServerUrl: function() {
@@ -27,6 +54,44 @@ angular.module('ionicApp.services', [])
 		},
 		getResponseOk: function() {
 			return RESPONSE_OK;
+		},
+		sessionOnOpen: function() {
+			session.connected = true;
+			session.connecting = false;
+		},
+		sessionOnClose: function() {
+			session.connected = false;
+			session.client = null;
+		},
+		isReconnecting: function() {
+			return session.connecting;
+		},
+		startReconnect: function() {
+			session.connecting = true;
+		},
+		checkSocketAlive: function() {
+			return session.connected;
+		},
+		sendMsg: function(jsonStr) {
+			session.client.send(jsonStr);
+		},
+		getSessionId: function() {
+			return session.id;
+		},
+		setSessionId: function(id) {
+			session.id = id;
+		},
+		saveSessionId: function(key) {
+			window.localStorage[key + "sessionId"] = session.id;
+		},
+		loadSessionId: function(kye) {
+			return loadSessionId();
+		},
+		getInvalidateSessionId: function() {
+			return INVALIDATE_SESSIONID;
+		},
+		getStorageKey: function() {
+			return STORAGE_KEY;
 		}
 	};
 })
@@ -42,6 +107,16 @@ angular.module('ionicApp.services', [])
 	};
 	return {
 		getStoreInfo: function() {
+			return storeInfo;
+		},
+		saveStoreInfo: function(key) {
+			window.localStorage[key + "storeInfo"] = JSON.stringify(storeInfo);
+		},
+		loadStoreInfo: function(key) {
+			var storeInfoStr = window.localStorage[key + "storeInfo"];
+			if (storeInfoStr != null) {
+				storeInfo = JSON.parse(storeInfoStr);
+			}
 			return storeInfo;
 		}
 	};
@@ -168,6 +243,16 @@ angular.module('ionicApp.services', [])
 			else {
 				return true;
 			}
+		},
+		saveUserInfo: function(key) {
+			window.localStorage[key + "userInfo"] = JSON.stringify(userInfo);
+		},
+		loadUserInfo: function(key) {
+			var userInfoStr = window.localStorage[key + "userInfo"];
+			if (userInfoStr != null) {
+				userInfo = JSON.parse(userInfoStr);
+			}
+			return userInfo;
 		}
 	}
 

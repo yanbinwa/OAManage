@@ -1,30 +1,48 @@
 angular.module('ionicApp.controllers')
 
-.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, WebsocketClient, StoreInfo, Notification, UserInfo) {
+.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, $timeout, WebsocketClient, StoreInfo, Notification, UserInfo) {
 
     $scope.$watch('$viewContentLoaded', function(event) {
-    	if(!UserInfo.isUserLogin()) {
-			$state.go('login');
-		}
+
 	})
 	
 	$scope.infoNum = Notification.getNotificationsSize();
-	$scope.session = WebsocketClient.getSession();
-	$scope.storeInfo = StoreInfo.getStoreInfo();
+	$scope.session = WebsocketClient.getSession(onOpen, onClose, onMessage);
+	
+	//$scope.storeInfo = StoreInfo.getStoreInfo();
 	
 	$scope.notifications = Notification.getNotifications();
 	
 	$scope.$on("MainCtrl", function(event, msg) {
-		if(checkSocketAlive()) {
+		if(WebsocketClient.checkSocketAlive()) {
 			sendMsgToServer(msg);
 		} 
 		else {
-			var responseMsg = {
-				routeKey : msg.routeKey,
-				functionKey : msg.functionKey,
-				responsePayLoad : WebsocketClient.getWebSocketError()
-			};
-			$scope.$broadcast(responseMsg.routeKey, responseMsg);
+			reConnectSession(1);
+			if(WebsocketClient.checkSocketAlive()) {
+				sendMsgToServer(msg);
+			}
+			else {
+				var responseMsg = {
+					routeKey : msg.routeKey,
+					functionKey : msg.functionKey,
+					responseCode : WebsocketClient.getWebSocketError(),
+					responsePayLoad : null
+				};
+				handleManage(responseMsg);
+			}
+		}
+	})
+	
+	$scope.$on("MainCtrlNotify", function(event, notify) {
+		var routeKey = notify.routeKey;
+		if (routeKey == "MainCtrlNotify") {
+			if (notify.functionKey == "reConnectSession") {
+				reConnectSessionResponse();
+			}
+		}
+		else {
+			
 		}
 	})
 	
@@ -52,18 +70,79 @@ angular.module('ionicApp.controllers')
 		$scope.$broadcast(responseMsg.routeKey, responseMsg);
 	}
 	
-	$scope.session.client.onmessage = function() {
+	function onMessage(event) {
 		handleManage(event);
 	}
 	
-	$scope.session.client.onopen = function(event) {
-		$scope.session.connected = true;
-		getStoreInfo($scope.storeInfo.id);
+	function onOpen() {
+		alert('websocket connected');
+		WebsocketClient.sessionOnOpen();
+		onSessionConnected();
+		//getStoreInfo($scope.storeInfo.id);
 	}
-
-	$scope.session.client.onclose = function() {
-		$scope.session.connected = false;
-		$scope.session.client = null;
+	
+	function onClose() {
+		WebsocketClient.sessionOnClose();
+	}
+	
+	var onSessionConnected = function() {
+		getSessionId();
+	}
+	
+	var getSessionId = function() {
+		var sessionId = WebsocketClient.getSessionId();
+		var data = {
+			functionKey: 'getSessionId',
+			urlName: 'GetSessionId',
+			payLoad: sessionId,
+			urlParameter: null
+		}
+		sendMsg(data);
+	}
+	
+	var getSessionIdResponse = function(msg) {
+		var responseCode = msg.responseCode;
+		var stateAuth = false;
+  		if (responseCode != WebsocketClient.getResponseOk()) {
+  			return;
+  		}
+  		var sessionId = msg.responsePayLoad;
+  		if (sessionId == WebsocketClient.getSessionId()) {
+  			StoreInfo.loadStoreInfo(WebsocketClient.getStorageKey());
+  			UserInfo.loadUserInfo(WebsocketClient.getStorageKey());
+  			stateAuth = true;
+  		}
+  		else {
+  			WebsocketClient.setSessionId(sessionId);
+  			WebsocketClient.saveSessionId(WebsocketClient.getStorageKey());
+  		}
+  		
+  		//send sessionOpenMsg to other states
+  		var responseMsg = {
+			routeKey : 'GeneralEvent',
+			functionKey : 'onSessionConnected',
+			stateAuth: stateAuth
+		};
+  		$scope.$broadcast(responseMsg.routeKey, responseMsg);
+	}
+	
+	var reConnectSession = function(timeout) {
+		if (WebsocketClient.isReconnecting())
+		{
+			return;
+		}
+		WebsocketClient.startReconnect();
+		$timeout(function() {
+			var data = {
+				functionKey: 'reConnectSession',
+				stateName: null
+			}
+			sendNotify(data);
+		}, timeout);
+	}
+	
+	var reConnectSessionResponse = function(notify) {
+		$scope.session = WebsocketClient.getSession(onOpen, onClose, onMessage);
 	}
 	
   	$scope.toggleLeft = function() {
@@ -84,13 +163,9 @@ angular.module('ionicApp.controllers')
   		$scope.infoNum = Notification.getNotificationsSize();
   	}
   	
-  	var checkSocketAlive = function() {
-  		return $scope.session.connected;
-  	}
-  	
   	var sendMsgToServer = function(msg) {
   		var jsonStr = JSON.stringify(msg);
-  		$scope.session.client.send(jsonStr);
+  		WebsocketClient.sendMsg(jsonStr);
   	}
   	
   	var handleManage = function(event) {
@@ -106,6 +181,9 @@ angular.module('ionicApp.controllers')
 			}
 			else if(functionKey == 'getNotifyMessage') {
 				getNotifyMessageResponse(msg);
+			}
+			else if(functionKey == 'getSessionId') {
+				getSessionIdResponse(msg);
 			}
 		}
 	}
@@ -151,5 +229,10 @@ angular.module('ionicApp.controllers')
   	var sendMsg = function(msg) {
   		msg.routeKey = 'MainCtrl';
   		$scope.$emit("MainCtrl", msg);
+  	}
+  	
+  	var sendNotify = function(notify) {
+  		notify.routeKey = 'MainCtrlNotify';
+  		$scope.$emit("MainCtrlNotify", notify);
   	}
 });

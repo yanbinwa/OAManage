@@ -3,10 +3,25 @@ angular.module('ionicApp.controllers')
 .controller('UserEmployeeTabCtrl', function($scope, $state, $ionicPopup, WebsocketClient, UserInfo, DateUtil) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
-		if(!UserInfo.isUserLogin()) {
+
+	})
+	
+	$scope.$on("GeneralEvent", function(event, msg) {
+		var functionKey = msg.functionKey;
+		if (functionKey == 'onSessionConnected') {
+			onSessionConnectedResponse(msg);
+		}
+	});
+	
+	var onSessionConnectedResponse = function(msg) {
+		var stateAuth = msg.stateAuth;
+		if (!stateAuth) {
 			$state.go('login');
 		}
-	})
+		else {
+			$scope.userInfo = UserInfo.getUserInfo();
+		}
+	}
 	
 	$scope.$on("UserEmployeeTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;

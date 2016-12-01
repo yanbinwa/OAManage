@@ -21,7 +21,6 @@ import com.yanbinwa.OASystem.Message.MessageHander;
 import com.yanbinwa.OASystem.Message.SignMessageHander;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Session.Session;
-import com.yanbinwa.OASystem.Session.Session.SessionType;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 @Service("messageProcessorService")
@@ -139,12 +138,6 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
         }
     }
 
-    @Override
-    public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType)
-    {
-        // TODO Auto-generated method stub
-        return messageServiceSpring.changeSessionType(session, sourceType, targetType);
-    }
 
     @Override
     public boolean isWhatUrl(String urlName, String url)
@@ -154,16 +147,16 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
     }
 
     @Override
-    public SessionType getSessionTypeFromUser(User user)
-    {
-        // TODO Auto-generated method stub
-        return messageServiceSpring.getSessionTypeFromUser(user);
-    }
-
-    @Override
     public boolean sendEvent(Event event)
     {
         // TODO Auto-generated method stub
         return eventService.sendMessage(event);
+    }
+
+    @Override
+    public boolean loginSession(Session session, User user)
+    {
+        // TODO Auto-generated method stub
+        return messageServiceSpring.loginSession(session, user);
     }
 }

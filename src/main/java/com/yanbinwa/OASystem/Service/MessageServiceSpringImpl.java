@@ -2,6 +2,7 @@ package com.yanbinwa.OASystem.Service;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -45,6 +46,11 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
 {
     private static Map<SessionType, CopyOnWriteArraySet<Session>> sessionTypeToSessionMap = new HashMap<SessionType, CopyOnWriteArraySet<Session>>();
     private static Map<WebSocketSession, Session> webSocketSessionToSessionMap = new HashMap<WebSocketSession, Session>();
+    private static Map<Long, Set<String>> agingTimeToSessionIdMap = new HashMap<Long, Set<String>>();
+    private static Map<String, Long> sessionIdToAgingTimeMap = new HashMap<String, Long>();
+    private static Map<String, Session> onLineSessionIdMap = new HashMap<String, Session>();
+    private static Map<String, User> sessionIdToUserMap = new HashMap<String, User>();
+    
     private static final Logger logger = Logger.getLogger(MessageServiceSpringImpl.class);
     
     private BlockingQueue<Message> notifyAdminQueue;
@@ -59,6 +65,9 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     
     @Autowired
     private EventService eventService;
+    
+    @Autowired
+    private WebsocketMessageProcessorService websocketMessageProcessorService;
         
     @PostConstruct
     public void init()
@@ -110,6 +119,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             }
             
         }).start();
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                // TODO Auto-generated method stub
+                agingSessionId();
+            }
+            
+        }).start();
     }
     
     @PreDestroy
@@ -140,11 +160,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     private void handleMessageOnOpen(WebSocketSession webSocketSession)
     {
         // TODO Auto-generated method stub
-        Session session = new Session(webSocketSession);
-        session.setSessionType(SessionType.NoneAuthorizationSession);
-        sessionTypeToSessionMap.get(SessionType.NoneAuthorizationSession).add(session);
-        webSocketSessionToSessionMap.put(webSocketSession, session);
-        logger.info("this is sprint speaking: add a user");
+        createSession(webSocketSession);
     }
     
     private void handleMessageOnMessage(WebSocketSession session, TextMessage message)
@@ -156,7 +172,14 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         
         if (msg != null)
         {
-            messageProcessorService.enqueueMessage(msg);
+            if (msg.getMethod() == Message.MessageHttpMethod.WEBSOCKET)
+            {
+                websocketMessageProcessorService.enqueueMessage(msg);
+            }
+            else
+            {
+                messageProcessorService.enqueueMessage(msg);
+            }
         }
         else
         {
@@ -168,8 +191,43 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     private void handleMessageOnClose(WebSocketSession webSocketSession)
     {
         // TODO Auto-generated method stub
+        closeSession(webSocketSession);
+    }
+    
+    private boolean isSessionLogin(Session session)
+    {
+        return !(session.getSessionType() == SessionType.NoneAuthorizationSession);
+    }
+    
+    @Override
+    public boolean isSessionIdOnLine(String sessionId)
+    {
+        // TODO Auto-generated method stub
+        return onLineSessionIdMap.containsKey(sessionId);
+    }
+
+    @Override
+    public void closeSession(WebSocketSession webSocketSession)
+    {
+        // TODO Auto-generated method stub
         Session session = webSocketSessionToSessionMap.remove(webSocketSession);
-        sessionTypeToSessionMap.get(session.getSessionType()).remove(session);
+        sessionTypeToSessionMap.get(session.getSessionType()).remove(session); 
+        onLineSessionIdMap.remove(session.getSessionId());
+        
+        if (isSessionLogin(session))
+        {
+            Long agingTime = System.currentTimeMillis() + (Long)propertyService.getProperty(NOTIFY_SESSION_AGE_TIME, Long.class);
+            String sessionId = session.getSessionId();
+            Set<String> sessionIdList = agingTimeToSessionIdMap.get(agingTime);
+            if (sessionIdList == null)
+            {
+                sessionIdList = new HashSet<String>();
+                agingTimeToSessionIdMap.put(agingTime, sessionIdList);
+            }
+            sessionIdList.add(sessionId);
+            sessionIdToAgingTimeMap.put(sessionId, agingTime);
+        }
+        
         try
         {
             webSocketSession.close();
@@ -178,7 +236,50 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         {
             // TODO Auto-generated catch block
         }
-        logger.info("this is sprint speaking: remove a user");
+    }
+
+    @Override
+    public boolean loginSession(Session session, User user)
+    {
+        // TODO Auto-generated method stub
+        session.setUser(user);
+        SessionType targetType = getSessionTypeFromUser(user);
+        boolean ret = changeSessionType(session, session.getSessionType(), targetType);
+        if (!ret)
+        {
+            return false;
+        }
+        sessionIdToUserMap.put(session.getSessionId(), user);
+        return ret;
+    }
+
+    @Override
+    public void createSession(WebSocketSession webSocketSession)
+    {
+        // TODO Auto-generated method stub
+        Session session = new Session(webSocketSession);
+        session.setSessionType(SessionType.NoneAuthorizationSession);
+        sessionTypeToSessionMap.get(SessionType.NoneAuthorizationSession).add(session);
+        webSocketSessionToSessionMap.put(webSocketSession, session);
+    }
+    
+    @Override
+    public boolean reLoginSession(Session session)
+    {
+        // TODO Auto-generated method stub
+        String sessionId = session.getSessionId();
+        User user = sessionIdToUserMap.get(session.getSessionId());
+        if (user == null)
+        {
+            return false;
+        }
+        Long ageTime = sessionIdToAgingTimeMap.remove(sessionId);
+        Set<String> sessionIdSet = agingTimeToSessionIdMap.get(ageTime);
+        if (sessionIdSet != null)
+        {
+            sessionIdSet.remove(sessionId);
+        }
+        return loginSession(session, user);
     }
 
     @Override
@@ -194,7 +295,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         {
             return false;
         }
-        if (sessionType == SessionType.NoneAuthorizationSession)
+        if (!isSessionLogin(session))
         {
             if (message.getUrl().contains("/login/"))
             {
@@ -297,6 +398,8 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             return MessageHttpMethod.POST;
         case Message.METHOD_DEL_KEY:
             return MessageHttpMethod.DEL;
+        case Message.METHOD_WEBSOCKET:
+            return MessageHttpMethod.WEBSOCKET;
         default:
             return null;
         }
@@ -430,6 +533,39 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         }
     }
     
+    private void agingSessionId()
+    {
+        while(true)
+        {
+            for(Map.Entry<Long, Set<String>> entry : agingTimeToSessionIdMap.entrySet()) 
+            {
+                Long currentTimestamp = System.currentTimeMillis();
+                if (entry.getKey() < currentTimestamp)
+                {
+                    if (entry.getValue() != null) 
+                    {
+                        for(String sessionId : entry.getValue())
+                        {
+                            sessionIdToAgingTimeMap.remove(sessionId);
+                            sessionIdToUserMap.remove(sessionId);
+                        }
+                    }
+                    agingTimeToSessionIdMap.remove(entry.getKey());
+                }
+            }
+            try
+            {
+                Thread.sleep(60000);
+            } 
+            catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+    }
+    
     class NotifyAdminUserHelper implements Runnable
     {
         
@@ -497,6 +633,13 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             
         }
         
+    }
+
+    @Override
+    public boolean isSessionExpired(String sessionId)
+    {
+        // TODO Auto-generated method stub
+        return !sessionIdToAgingTimeMap.containsKey(sessionId);
     }
     
 }

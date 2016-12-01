@@ -3,7 +3,6 @@ package com.yanbinwa.OASystem.Message;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Service.MessageProcessorService;
 import com.yanbinwa.OASystem.Session.Session;
-import com.yanbinwa.OASystem.Session.Session.SessionType;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 import net.sf.json.JSONObject;
@@ -33,9 +32,7 @@ public class LoginMessageHander extends MessageHander
         JSONObject jsObj = JSONObject.fromObject(userStr);
         User user = (User)JSONObject.toBean(jsObj, User.class);
         Session session = message.getSession();
-        session.setUser(user);
-        SessionType targetType = messageProcessorService.getSessionTypeFromUser(user);
-        boolean ret = messageProcessorService.changeSessionType(session, session.getSessionType(), targetType);
+        boolean ret = messageProcessorService.loginSession(session, user);
         if (! ret)
         {
             message.setResponsePayLoad("Login Error");

@@ -32,6 +32,7 @@ public interface MessageServiceSpring
     public static final String KEEP_ALIVE_SECONDS = "MessageService_KeepAliveSeconds";
     public static final String NOTIFY_ADMIN_QUEUE_SIZE = "MessageService_NotifyAdminQueueSize";
     public static final String NOTIFY_NORMAL_QUEUE_SIZE = "MessageService_NotifyNormalQueueSize";
+    public static final String NOTIFY_SESSION_AGE_TIME = "MessageService_SessionAgeTime";
     
     public static final String USERLOGIN_ROUTEKEY = "MessageService_UserLogin_RouteKey";
     public static final String USERLOGIN_FUNCTIONKEY = "MessageService_UserLogin_FunctionKey";
@@ -41,13 +42,23 @@ public interface MessageServiceSpring
     public static final String NOTIFY_ADMIN_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Admin_File.txt";
     public static final String NOTIFY_NORMAL_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Normal_File.txt";
     
+    public static final String GET_SESSION_ID = "getSessionId";
+    
     public void handleMessage(WebSocketSession session, TextMessage message, int type);
     public boolean validateSession(Session session, Message message);
     public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType);
+    public void closeSession(WebSocketSession websocketSession);
+    public boolean loginSession(Session session, User user);
+    public void createSession(WebSocketSession websocketSession);
     
     public boolean isWhatUrl(String urlName, String url);
     public SessionType getSessionTypeFromUser(User user);
     
     public boolean notifiyAdminUser(Message message);
     public boolean notifiyNormalUser(Message message);
+    
+    public boolean isSessionIdOnLine(String sessionId);
+    public boolean isSessionExpired(String sessionId);
+    public boolean reLoginSession(Session session);
+       
 }

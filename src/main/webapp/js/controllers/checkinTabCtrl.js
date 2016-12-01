@@ -2,10 +2,23 @@ angular.module('ionicApp.controllers')
 
 .controller('CheckinTabCtrl', function($scope, $state, WebsocketClient, UserInfo) {
 	$scope.$watch('$viewContentLoaded', function(event) {
-		if(!UserInfo.isUserLogin()) {
+
+	})
+	
+	$scope.$on("GeneralEvent", function(event, msg) {
+		var functionKey = msg.functionKey;
+		if (functionKey == 'onSessionConnected') {
+			onSessionConnectedResponse(msg);
+		}
+	});
+	
+	var onSessionConnectedResponse = function(msg) {
+		var stateAuth = msg.stateAuth;
+		if (!stateAuth) {
 			$state.go('login');
 		}
-	})
+	}
+	
 	$scope.$on("CheckinTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
 		if (functionKey == 'getORCodeKey') {

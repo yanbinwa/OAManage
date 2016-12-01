@@ -3,10 +3,22 @@ angular.module('ionicApp.controllers')
 .controller('AddEmployeeTabCtrl', function($scope, $state, WebsocketClient, Employee, UserInfo) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
-		if(!UserInfo.isUserLogin()) {
+
+	})
+	
+	$scope.$on("GeneralEvent", function(event, msg) {
+		var functionKey = msg.functionKey;
+		if (functionKey == 'onSessionConnected') {
+			onSessionConnectedResponse(msg);
+		}
+	});
+	
+	var onSessionConnectedResponse = function(msg) {
+		var stateAuth = msg.stateAuth;
+		if (!stateAuth) {
 			$state.go('login');
 		}
-	})
+	}
 	
 	$scope.$on("AddEmployeeTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
@@ -20,6 +32,7 @@ angular.module('ionicApp.controllers')
 			getEmployeeByIdResponse(msg);
 		}
 	});
+	
 	$scope.addEmployee = function(employee) {
 		var data = {
 			functionKey: 'addEmployee',
