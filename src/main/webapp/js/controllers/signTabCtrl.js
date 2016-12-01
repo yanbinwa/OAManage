@@ -2,6 +2,10 @@ angular.module('ionicApp.controllers')
 
 .controller('SignTabCtrl', function($scope, $state, User, Employee, DateUtil, WebsocketClient) {
     
+    $scope.$watch('$viewContentLoaded', function(event) {
+		
+	})
+	
     $scope.$on("SignTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
 		if (functionKey == 'openTab') {
@@ -138,6 +142,7 @@ angular.module('ionicApp.controllers')
 			return;
 		}
     	alert("您的申请已经成功提交，请等待审核");
+    	updateTab();
     	$state.go('login');
     }
     

@@ -116,4 +116,59 @@ angular.module('ionicApp.services', [])
 			return year + "/" + month + "/" + day;
 		}
 	}
+})
+
+.factory('Notification', function() {
+	
+	var notifications = [];
+	
+	return {
+		getNotifications: function() {
+			return notifications;
+		},
+		getNotificationsSize: function() {
+			return notifications.length;
+		},
+		getNotificationByIndex: function(index) {
+			return notifications[i];
+		},
+		removeNotification: function(notification) {
+			notifications.splice(notifications.indexOf(notification), 1);
+		},
+		addNotification: function(notification) {
+			notifications.push(notification);
+		}
+	}
+})
+
+.factory('UserInfo', function() {
+
+	var userInfo = {};
+	
+	return {
+		getUserInfo: function() {
+			return userInfo;
+		},
+		cleanUserInfo: function() {
+			userInfo = {};
+		},
+		setUserInfoUser: function(user) {
+			userInfo.user = user;
+		},
+		setUserInfoStore: function(store) {
+			userInfo.store = store;
+		},
+		setUserInfoEmployee: function(employee) {
+			userInfo.employee = employee;
+		},
+		isUserLogin: function() {
+			if (userInfo == null || userInfo.user == null) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	}
+
 });

@@ -5,6 +5,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,12 @@ public class NotificationServiceImpl implements NotificationService, EventListen
             }
             
         }).start();
+    }
+    
+    @PreDestroy
+    public void destroy()
+    {
+        
     }
     
     private void handleEvent()
@@ -137,6 +144,7 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         String functionKey = (String)propertyService.getProperty(MessageServiceSpring.USERSIGN_FUNCTIONKEY, String.class);
         int responseCode = HttpUtils.RESPONSE_OK;
         JSONObject jsonObj = new JSONObject();
+        jsonObj.put("type", "UserSignVerify");
         jsonObj.put("user", user);
         jsonObj.put("userObject", userObject);
         

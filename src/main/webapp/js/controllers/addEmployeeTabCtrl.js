@@ -1,8 +1,11 @@
 angular.module('ionicApp.controllers')
 
-.controller('AddEmployeeTabCtrl', function($scope, WebsocketClient, Employee) {
+.controller('AddEmployeeTabCtrl', function($scope, $state, WebsocketClient, Employee, UserInfo) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
+		if(!UserInfo.isUserLogin()) {
+			$state.go('login');
+		}
 	})
 	
 	$scope.$on("AddEmployeeTabCtrl", function(event, msg) {

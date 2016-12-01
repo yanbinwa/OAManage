@@ -1,4 +1,4 @@
-angular.module('ionicApp.controllers', []);
+angular.module('ionicApp.controllers', ['ionic']);
 
 //.controller('MainCtrl', function($scope, $rootScope, $ionicSideMenuDelegate, WebsocketClient, StoreInfo) {
 //

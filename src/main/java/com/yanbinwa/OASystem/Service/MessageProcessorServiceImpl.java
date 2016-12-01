@@ -6,6 +6,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -17,6 +18,7 @@ import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.LoginMessageHander;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.MessageHander;
+import com.yanbinwa.OASystem.Message.SignMessageHander;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Session.Session;
 import com.yanbinwa.OASystem.Session.Session.SessionType;
@@ -28,7 +30,6 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
 {
     private ThreadPoolTaskExecutor poolTaskExecutor;
     private BlockingQueue<Message> messageQueue;
-    private BlockingQueue<Event> eventQueue;
 
     @Autowired
     private PropertyService propertyService;
@@ -61,21 +62,14 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
             }
         
         }).start();
-        
-        eventQueue = new ArrayBlockingQueue<Event>((Integer)propertyService.getProperty(EVENT_QUEUE_SIZE, Integer.class));
-        
-        new Thread(new Runnable() {
-
-            @Override
-            public void run()
-            {
-                // TODO Auto-generated method stub
-                handleEvent();
-            }
-            
-        }).start();
     }
     
+    @PreDestroy
+    public void destroy()
+    {
+        
+    }
+        
     @Override
     public boolean enqueueMessage(Message message)
     {
@@ -96,7 +90,7 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
         }
         else if(messageServiceSpring.isWhatUrl(MessageServiceSpring.USER_SIGN, message.getUrl()))
         {
-            
+            return new SignMessageHander(message, this);
         }
         return new MessageHander(message, this);
     }
@@ -143,35 +137,6 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
                 }
             }
         }
-    }
-    
-    private void handleEvent()
-    {
-        while(true)
-        {
-            Event event = null;
-            try
-            {
-                event = eventQueue.poll(1000, TimeUnit.MILLISECONDS);
-            } 
-            catch (InterruptedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if(event == null)
-            {
-                continue;
-            }
-            eventService.sendMessage(event);
-        }
-    }
-
-    @Override
-    public boolean enqueueEvent(Event event)
-    {
-        // TODO Auto-generated method stub
-        return eventQueue.add(event);
     }
 
     @Override

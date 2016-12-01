@@ -9,6 +9,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ public class EventServiceImpl implements EventService
             }
             
         }).start();
+    }
+    
+    @PreDestroy
+    public void destroy()
+    {
+        
     }
     
     @Override

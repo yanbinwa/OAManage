@@ -1,10 +1,10 @@
-package com.yanbinwa.OASystem.Dao;
+package com.yanbinwa.OASystem.Service;
 
 import java.util.List;
 
 import com.yanbinwa.OASystem.Model.User;
 
-public interface UserDao
+public interface UserService
 {
     User findByName(String name);
     
@@ -12,5 +12,5 @@ public interface UserDao
     
     List<User> findNoneAuthorizationUser();
     
-    User findById(int id);
+    String changePassword(int id, String oldPassword, String newPassword);
 }

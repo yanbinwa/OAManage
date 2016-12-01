@@ -1,6 +1,12 @@
 angular.module('ionicApp.controllers')
 
-.controller('UpdataInfoTabCtrl', function($scope, StoreInfo) {
+.controller('UpdataInfoTabCtrl', function($scope, $state, StoreInfo, UserInfo) {
+	
+    $scope.$watch('$viewContentLoaded', function(event) {
+    	if(!UserInfo.isUserLogin()) {
+			$state.go('login');
+		}
+	})
 	
 	$scope.storeInfo = StoreInfo.getStoreInfo();
 	$scope.isDisableEditTag = true;

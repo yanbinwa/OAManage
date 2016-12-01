@@ -38,6 +38,9 @@ public interface MessageServiceSpring
     public static final String USERSIGN_ROUTEKEY = "MessageService_UserSign_RouteKey";
     public static final String USERSIGN_FUNCTIONKEY = "MessageService_UserSign_FunctionKey";
     
+    public static final String NOTIFY_ADMIN_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Admin_File.txt";
+    public static final String NOTIFY_NORMAL_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Normal_File.txt";
+    
     public void handleMessage(WebSocketSession session, TextMessage message, int type);
     public boolean validateSession(Session session, Message message);
     public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType);

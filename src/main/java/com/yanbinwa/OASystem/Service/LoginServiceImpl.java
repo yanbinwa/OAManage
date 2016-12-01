@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yanbinwa.OASystem.Dao.UserDao;
 import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.User;
@@ -25,7 +24,7 @@ public class LoginServiceImpl implements LoginService
 {
     
     @Autowired
-    private UserDao dao;
+    private UserService userService;
     
     @Autowired
     private EmployeeService employeeService;
@@ -54,21 +53,21 @@ public class LoginServiceImpl implements LoginService
     private int getUserId()
     {
         int userId = atomicUserId.getAndIncrement();
-        propertyService.setLocalProperty(LoginService.USER_ID_BAK, userId, Integer.class);
+        propertyService.setLocalProperty(LoginService.USER_ID_BAK, atomicUserId, Integer.class);
         return userId;
     }
     
     private int getEmployeeId()
     {
         int employeeId = atomicEmployeeId.getAndIncrement();
-        propertyService.setLocalProperty(LoginService.EMPLOYEE_ID_BAK, employeeId, Integer.class);
+        propertyService.setLocalProperty(LoginService.EMPLOYEE_ID_BAK, atomicEmployeeId, Integer.class);
         return employeeId;
     }
     
     private int getStoreId()
     {
         int storeId = atomicStoreId.getAndIncrement();
-        propertyService.setLocalProperty(LoginService.STORE_ID_BAK, storeId, Integer.class);
+        propertyService.setLocalProperty(LoginService.STORE_ID_BAK, atomicStoreId, Integer.class);
         return storeId;
     }
     
@@ -98,7 +97,7 @@ public class LoginServiceImpl implements LoginService
         {
         case "普通用户":
             return AuthType.Normal;
-        case "管理员":
+        case "管理员用户":
             return AuthType.Admin;
         }
         return null;
@@ -113,7 +112,7 @@ public class LoginServiceImpl implements LoginService
         JSONObject userJsonObj = (JSONObject)userObj;
         
         String username = userJsonObj.getString(LoginService.USERNAME);
-        User user = dao.findByName(username);
+        User user = userService.findByName(username);
         if(user != null)
         {
             return null;
@@ -153,7 +152,7 @@ public class LoginServiceImpl implements LoginService
         employee.setStoreId(storeId);
         
         user.setUserId(employee.getId());
-        dao.saveUser(user);
+        userService.saveUser(user);
         employeeService.saveEmployee(employee);
         
         return true;
@@ -219,7 +218,7 @@ public class LoginServiceImpl implements LoginService
     {
         // TODO Auto-generated method stub
         String username = payLoad.getString(LoginService.USERNAME);
-        User user = dao.findByName(username);
+        User user = userService.findByName(username);
         if (user == null)
         {
             return null;
@@ -254,6 +253,16 @@ public class LoginServiceImpl implements LoginService
         }
         
         return user;
+    }
+
+    @Override
+    public String changePassword(JSONObject payLoad)
+    {
+        // TODO Auto-generated method stub
+        int id = payLoad.getInt(LoginService.ID);
+        String oldPassword = payLoad.getString(LoginService.OLD_PASSWORD);
+        String newPassword = payLoad.getString(LoginService.NEW_PASSWORD);
+        return userService.changePassword(id, oldPassword, newPassword);
     }
 
 }

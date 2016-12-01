@@ -2,7 +2,9 @@ package com.yanbinwa.OASystem.Service;
 
 public interface PropertyService
 {
-    public static final String SYSTEM_PROPERTIES_PATH = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources/system.properties";
+    public static final String SYSTEM_RESOURCE_DIR = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources";
+    
+    public static final String SYSTEM_PROPERTIES_PATH = SYSTEM_RESOURCE_DIR + "/" + "system.properties";
     
     @SuppressWarnings("rawtypes")
     public Object getProperty(String key, Class clazz);

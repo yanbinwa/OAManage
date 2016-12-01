@@ -1,14 +1,18 @@
 angular.module('ionicApp.controllers')
 
-.controller('MainCtrl', function($scope, $rootScope, $ionicSideMenuDelegate, WebsocketClient, StoreInfo) {
+.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, WebsocketClient, StoreInfo, Notification, UserInfo) {
 
-	$scope.infoNum = 0;
+    $scope.$watch('$viewContentLoaded', function(event) {
+    	if(!UserInfo.isUserLogin()) {
+			$state.go('login');
+		}
+	})
+	
+	$scope.infoNum = Notification.getNotificationsSize();
 	$scope.session = WebsocketClient.getSession();
 	$scope.storeInfo = StoreInfo.getStoreInfo();
 	
-	$scope.$watch('$viewContentLoaded', function(event) {
-		
-	})
+	$scope.notifications = Notification.getNotifications();
 	
 	$scope.$on("MainCtrl", function(event, msg) {
 		if(checkSocketAlive()) {
@@ -75,6 +79,11 @@ angular.module('ionicApp.controllers')
   		return true;
   	}
   	
+  	$scope.removeNotification = function(notification) {
+  		Notification.removeNotification(notification);
+  		$scope.infoNum = Notification.getNotificationsSize();
+  	}
+  	
   	var checkSocketAlive = function() {
   		return $scope.session.connected;
   	}
@@ -95,6 +104,9 @@ angular.module('ionicApp.controllers')
 			if (functionKey == 'getStoreInfo') {
 				getStoreInfoResponse(msg);
 			}
+			else if(functionKey == 'getNotifyMessage') {
+				getNotifyMessageResponse(msg);
+			}
 		}
 	}
   	
@@ -113,20 +125,31 @@ angular.module('ionicApp.controllers')
   		if (responseCode != WebsocketClient.getResponseOk()) {
   			return;
   		}
-  		store = msg.responsePayLoad;
+  		var store = msg.responsePayLoad;
   		$scope.storeInfo.name = store.name;
   		$scope.storeInfo.address = store.address;
   		$scope.storeInfo.tel = store.tel;
+  	}
+  	
+  	var getNotifyMessageResponse = function(msg) {
+  		var responseCode = msg.responseCode;
+  		if (responseCode != WebsocketClient.getResponseOk()) {
+  			return;
+  		}
+  		var payLoad = msg.responsePayLoad;
+  		if (payLoad.type == "UserSignVerify") {
+  			handleUserSignVerifyNotification(payLoad);
+  		}
+  	}
+  	
+  	var handleUserSignVerifyNotification = function(payLoad) {
+  		var notification = payLoad;
+  		Notification.addNotification(payLoad);
+  		$scope.infoNum = Notification.getNotificationsSize();
   	}
   	
   	var sendMsg = function(msg) {
   		msg.routeKey = 'MainCtrl';
   		$scope.$emit("MainCtrl", msg);
   	}
-})
-
-.controller('HomeTabCtrl', function($scope) {
-	$scope.$watch('$viewContentLoaded', function(event) {
-		
-	})
 });

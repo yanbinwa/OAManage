@@ -1,8 +1,10 @@
 angular.module('ionicApp.controllers')
 
-.controller('CheckinTabCtrl', function($scope, WebsocketClient) {
+.controller('CheckinTabCtrl', function($scope, $state, WebsocketClient, UserInfo) {
 	$scope.$watch('$viewContentLoaded', function(event) {
-		
+		if(!UserInfo.isUserLogin()) {
+			$state.go('login');
+		}
 	})
 	$scope.$on("CheckinTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;

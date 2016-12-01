@@ -3,12 +3,14 @@ package com.yanbinwa.OASystem.Service;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.yanbinwa.OASystem.Model.User.AuthType;
 import com.yanbinwa.OASystem.Model.User.UserType;
 import com.yanbinwa.OASystem.Session.Session;
 import com.yanbinwa.OASystem.Session.Session.SessionType;
+import com.yanbinwa.OASystem.Utils.QueuePersistUtil;
 
 import net.sf.json.JSONObject;
 
@@ -82,7 +85,9 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         poolTaskExecutor.initialize();
         
         notifyAdminQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_ADMIN_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyAdminQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_QUEUE_FILENAME);
         notifyNormalQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_NORMAL_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyNormalQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_QUEUE_FILENAME);
         
         new Thread(new Runnable() {
 
@@ -90,7 +95,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             public void run()
             {
                 // TODO Auto-generated method stub
-                notifyUserAdmin();
+                notifyAdminUser();
             }
             
         }).start();
@@ -101,10 +106,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             public void run()
             {
                 // TODO Auto-generated method stub
-                notifyUserNormal();
+                notifyNormalUser();
             }
             
         }).start();
+    }
+    
+    @PreDestroy
+    public void destroy()
+    {
+        QueuePersistUtil.persistQueue(notifyAdminQueue, Message.class, NOTIFY_ADMIN_QUEUE_FILENAME);
+        QueuePersistUtil.persistQueue(notifyNormalQueue, Message.class, NOTIFY_NORMAL_QUEUE_FILENAME);
     }
     
     @Override
@@ -372,7 +384,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         return notifyNormalQueue.add(message);
     }
     
-    private void notifyUserAdmin()
+    private void notifyAdminUser()
     {
         while(true)
         {
@@ -390,12 +402,12 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             {
                 continue;
             }
-            NotifyUserHelper notifyUserHelper = new NotifyUserHelper(message);
-            poolTaskExecutor.execute(notifyUserHelper);
+            NotifyAdminUserHelper notifyAdminUserHelper = new NotifyAdminUserHelper(message);
+            poolTaskExecutor.execute(notifyAdminUserHelper);
         }
     }
     
-    private void notifyUserNormal()
+    private void notifyNormalUser()
     {
         while(true)
         {
@@ -413,17 +425,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             {
                 continue;
             }
-            NotifyUserHelper notifyUserHelper = new NotifyUserHelper(message);
-            poolTaskExecutor.execute(notifyUserHelper);
+            NotifyNormalUserHelper notifyNormalUserHelper = new NotifyNormalUserHelper(message);
+            poolTaskExecutor.execute(notifyNormalUserHelper);
         }
     }
     
-    class NotifyUserHelper implements Runnable
+    class NotifyAdminUserHelper implements Runnable
     {
         
         Message message;
         
-        public NotifyUserHelper(Message message)
+        public NotifyAdminUserHelper(Message message)
         {
             this.message = message;
         }
@@ -432,6 +444,56 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         public void run()
         {
             // TODO Auto-generated method stub
+            // find all session for adminUser and send the message
+            Set<Session> adminEmployeeSession = sessionTypeToSessionMap.get(SessionType.AdminEmployeeSession);
+            if (adminEmployeeSession == null || adminEmployeeSession.isEmpty())
+            {
+                try
+                {
+                    Thread.sleep(5000);
+                    if (adminEmployeeSession == null || adminEmployeeSession.isEmpty())
+                    {
+                        notifiyAdminUser(message);
+                        return;
+                    }
+                } 
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            TextMessage returnMessage = new TextMessage(message.getResponseJsonStr());
+            for(Session session : adminEmployeeSession)
+            {
+                try
+                {
+                    session.getWebSocketSession().sendMessage(returnMessage);
+                } 
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    
+    class NotifyNormalUserHelper implements Runnable
+    {
+        
+        Message message;
+        
+        public NotifyNormalUserHelper(Message message)
+        {
+            this.message = message;
+        }
+        
+        @Override
+        public void run()
+        {
+            // TODO Auto-generated method stub
+            // find all session for adminUser or normalUser and send the message
             
         }
         

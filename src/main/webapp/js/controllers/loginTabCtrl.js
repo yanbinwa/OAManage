@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('LoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient) {
+.controller('LoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient, UserInfo) {
     
 	$scope.$on("LoginTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
@@ -9,6 +9,12 @@ angular.module('ionicApp.controllers')
 		}
 		else if(functionKey == 'userLogin') {
 			userLoginResponse(msg);
+		}
+		else if(functionKey == 'getEmployeeInfo') {
+			getEmployeeInfoResponse(msg);
+		}
+		else if(functionKey == 'getStoreInfo') {
+			getStoreInfoResponse(msg);
 		}
 	});
 	
@@ -50,6 +56,57 @@ angular.module('ionicApp.controllers')
 			alert(msg.responsePayLoad);
 			return;
 		}
+    	var user = msg.responsePayLoad;
+    	UserInfo.setUserInfoUser(user);
+    	var userId = user.userId;
+    	if (user.userType == "Employee") {
+    		getEmployeeInfo(userId);
+    	}
+    	else {
+    		getStoreInfo(userId);
+    	}
+    }
+    
+    var getEmployeeInfo = function(id) {
+    	var data = {
+			functionKey: 'getEmployeeInfo',
+			urlName: 'GetEmployeeById',
+			payLoad: null,
+			urlParameter: id
+		}
+    	sendMsg(data);
+    }
+    
+    var getEmployeeInfoResponse = function(msg) {
+    	var responseCode = msg.responseCode;
+    	if (responseCode != WebsocketClient.getResponseOk()) {
+			alert(msg.responsePayLoad);
+			return;
+		}
+    	var employee = msg.responsePayLoad;
+    	UserInfo.setUserInfoEmployee(employee);
+    	alert("登陆成功");
+    	$state.go('app.main.home');
+    }
+    
+    var getStoreInfo = function(id) {
+    	var data = {
+			functionKey: 'getStoreInfo',
+			urlName: 'GetStoreById',
+			payLoad: null,
+			urlParameter: id
+		}
+    	sendMsg(data);
+    }
+    
+    var getStoreInfoResponse = function(msg) {
+    	var responseCode = msg.responseCode;
+    	if (responseCode != WebsocketClient.getResponseOk()) {
+			alert(msg.responsePayLoad);
+			return;
+		}
+    	var store = msg.responsePayLoad;
+    	UserInfo.setUserInfoStore(store);
     	alert("登陆成功");
     	$state.go('app.main.home');
     }

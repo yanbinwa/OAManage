@@ -18,7 +18,6 @@ public interface MessageProcessorService
     public static final String EVENT_QUEUE_SIZE = "MessageProcessor_EventQueueSize";
     
     public boolean enqueueMessage(Message message);
-    public boolean enqueueEvent(Event event);
     
     public boolean changeSessionType(Session session, SessionType sourceType, SessionType targetType);
     public boolean isWhatUrl(String urlName, String url);

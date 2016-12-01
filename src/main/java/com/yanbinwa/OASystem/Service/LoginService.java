@@ -18,6 +18,11 @@ public interface LoginService
     public static final String EMPLOYEE_ID_BAK = "Login_EmployeeIdBak";
     public static final String STORE_ID_BAK = "Login_StoreIdBak";
     
+    
+    public static final String OLD_PASSWORD = "oldPassword";
+    public static final String NEW_PASSWORD = "newPassword";
+    
     public User userSign(JSONObject payLoad);
     public User userLogin(JSONObject payLoad);
+    public String changePassword(JSONObject payLoad);
 }

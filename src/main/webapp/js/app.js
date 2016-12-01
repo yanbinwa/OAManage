@@ -61,6 +61,24 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
         }
       }
     })
+    .state('app.main.userEmployee', {
+      url: "/userEmployee",
+      views: {
+        'userEmployee-tab': {
+          templateUrl: "templates/userEmployee.html",
+          controller: 'UserEmployeeTabCtrl'
+        }
+      }
+    })
+    .state('app.main.userStore', {
+      url: "/userStore",
+      views: {
+        'userStore-tab': {
+          templateUrl: "templates/userStore.html",
+          controller: 'UserStoreTabCtrl'
+        }
+      }
+    })
     .state('login', {
       url: "/login",
       templateUrl: "templates/login.html",	
@@ -73,4 +91,5 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
     });
   
   $urlRouterProvider.otherwise("/login");
+  
 });

@@ -40,4 +40,10 @@ public class LoginController
         return loginService.userLogin(payLoad);
     }
     
+    @RequestMapping(value = LOGIN_ROOT_URL + "/changePassword", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String changePassword(@RequestBody JSONObject payLoad) 
+    {
+        return loginService.changePassword(payLoad);
+    }
+    
 }

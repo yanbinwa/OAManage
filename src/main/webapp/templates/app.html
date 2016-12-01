@@ -9,7 +9,7 @@
       
       <ion-nav-buttons side="right">
         <a class="button button-icon icon ion-gear-a" href="#"></a>
-        <a class="button button-icon icon ion-person" href="#"></a>
+        <a class="button button-icon icon ion-person" href="#/app/main/userEmployee"></a>
         <button class="button button-icon button-clear ion-paper-airplane" menu-toggle="right">
           <i ng-show="shouldShowInfoNum()">{{infoNum}}</i>
         </button>
@@ -40,10 +40,13 @@
       <h1 class="title">消息</h1>
     </ion-header-bar>
     <ion-content>
-      <ul class="list">
-        <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
-        
-      </ul>
+      <ion-list>
+        <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="notification in notifications" type="item-text-wrap">
+          <h2>{{notification.user.name}}</h2>
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-option-button class="button-assertive" ng-click="removeNotification(notification)">Delete</ion-option-button>
+        </ion-item>
+      </ion-list>
     </ion-content>
   </ion-side-menu>
 
