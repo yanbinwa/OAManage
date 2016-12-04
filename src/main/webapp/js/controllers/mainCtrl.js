@@ -235,4 +235,8 @@ angular.module('ionicApp.controllers')
   		notify.routeKey = 'MainCtrlNotify';
   		$scope.$emit("MainCtrlNotify", notify);
   	}
+  	
+  	$scope.isAdminUser = function() {
+  		return UserInfo.isAdminUser();
+  	}
 });

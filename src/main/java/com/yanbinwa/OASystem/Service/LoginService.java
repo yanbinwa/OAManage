@@ -22,7 +22,10 @@ public interface LoginService
     public static final String OLD_PASSWORD = "oldPassword";
     public static final String NEW_PASSWORD = "newPassword";
     
+    public static final String SESSION_ID = "sessionId";
+        
     public User userSign(JSONObject payLoad);
     public User userLogin(JSONObject payLoad);
     public String changePassword(JSONObject payLoad);
+    public String userLogout(JSONObject payLoad);
 }

@@ -265,4 +265,11 @@ public class LoginServiceImpl implements LoginService
         return userService.changePassword(id, oldPassword, newPassword);
     }
 
+    @Override
+    public String userLogout(JSONObject payLoad)
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

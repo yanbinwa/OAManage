@@ -18,6 +18,7 @@ public interface MessageProcessorService
     
     public boolean enqueueMessage(Message message);
     public boolean loginSession(Session session, User user);
+    public boolean logoutSession(Session session);
     public boolean isWhatUrl(String urlName, String url);
     public boolean sendEvent(Event event);
 }

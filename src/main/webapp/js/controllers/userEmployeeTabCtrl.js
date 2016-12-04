@@ -31,6 +31,9 @@ angular.module('ionicApp.controllers')
 		else if(functionKey == 'changeUserPassword') {
 			changeUserPasswordResponse(msg);
 		}
+		else if(functionKey == 'logout') {
+			logoutResponse(msg);
+		}
 	});
 	
 	$scope.userInfo = UserInfo.getUserInfo();
@@ -76,8 +79,36 @@ angular.module('ionicApp.controllers')
 		});
 	}
 	
-	$scope.loginOut = function() {
+	$scope.logout = function() {
+		var sessionId = WebsocketClient.getSessionId();
+		WebsocketClient.removeSessionId(WebsocketClient.getStorageKey());
+		WebsocketClient.clearSessionId();
 		
+		UserInfo.removeUserInfo(WebsocketClient.getStorageKey());
+		UserInfo.cleanUserInfo();
+		
+		var payLoad = {};
+		payLoad.sessionId = sessionId;
+		
+		var data = {
+			functionKey: 'logout',
+			urlName: 'UserLogout',
+			payLoad: JSON.stringify(payLoad),
+			urlParameter: null
+		}
+		sendMsg(data);
+	}
+	
+	var logoutResponse = function(msg) {
+		var responseCode = msg.responseCode;
+    	if (responseCode != WebsocketClient.getResponseOk()) {
+			alert(msg.responsePayLoad);
+			return;
+		}
+    	else {
+    		alert("退出成功");
+    	}
+    	$state.go('login');
 	}
 	
 	var openTabResponse = function() {

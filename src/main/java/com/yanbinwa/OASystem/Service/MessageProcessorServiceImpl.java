@@ -18,7 +18,6 @@ import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.LoginMessageHander;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.MessageHander;
-import com.yanbinwa.OASystem.Message.SignMessageHander;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Session.Session;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
@@ -83,13 +82,9 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
     
     private MessageHander getMessageHander(Message message)
     {
-        if (messageServiceSpring.isWhatUrl(MessageServiceSpring.USER_LOGIN, message.getUrl()))
+        if (messageServiceSpring.isWhatUrl(MessageServiceSpring.LOGIN, message.getUrl()))
         {
             return new LoginMessageHander(message, this);
-        }
-        else if(messageServiceSpring.isWhatUrl(MessageServiceSpring.USER_SIGN, message.getUrl()))
-        {
-            return new SignMessageHander(message, this);
         }
         return new MessageHander(message, this);
     }
@@ -158,5 +153,12 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
     {
         // TODO Auto-generated method stub
         return messageServiceSpring.loginSession(session, user);
+    }
+
+    @Override
+    public boolean logoutSession(Session session)
+    {
+        // TODO Auto-generated method stub
+        return messageServiceSpring.logoutSession(session);
     }
 }

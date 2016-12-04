@@ -3,7 +3,8 @@ angular.module('ionicApp.services', [])
 .factory('WebsocketClient', function() {
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
-	var SERVER_URL = "wss://localhost:8443/OAManage/websocket/websocketSpring";
+	//var SERVER_URL = "wss://localhost:8443/OAManage/websocket/websocketSpring";
+	var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
 	var INVALIDATE_SESSIONID = -1;
@@ -87,6 +88,12 @@ angular.module('ionicApp.services', [])
 		loadSessionId: function(kye) {
 			return loadSessionId();
 		},
+		removeSessionId: function(key) {
+			window.localStorage.removeItem(key + "sessionId");
+		},
+		clearSessionId: function() {
+			session.id = INVALIDATE_SESSIONID;
+		},
 		getInvalidateSessionId: function() {
 			return INVALIDATE_SESSIONID;
 		},
@@ -118,7 +125,10 @@ angular.module('ionicApp.services', [])
 				storeInfo = JSON.parse(storeInfoStr);
 			}
 			return storeInfo;
-		}
+		},
+		removeStoreInfo: function(key) {
+			window.localStorage.removeItem(key + "storeInfo");
+		},
 	};
 })
 
@@ -253,6 +263,20 @@ angular.module('ionicApp.services', [])
 				userInfo = JSON.parse(userInfoStr);
 			}
 			return userInfo;
+		},
+		removeUserInfo: function(key) {
+			window.localStorage.removeItem(key + "userInfo");
+		},
+		isAdminUser: function() {
+			if (userInfo.user == null) {
+				return false;
+			}
+			if (userInfo.user.authType == 'Admin') {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 

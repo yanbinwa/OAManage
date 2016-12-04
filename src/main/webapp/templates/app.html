@@ -29,7 +29,7 @@
         <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
         <a href="#/app/main/checkin" class="item" menu-close ng-click="openChildrenTab(1)">打卡</a>
         <a href="#/app/main/addEmployee" class="item" menu-close ng-click="openChildrenTab(2)">添加员工</a>
-        <a href="#/app/main/listEmployee" class="item" menu-close ng-click="openChildrenTab(3)">查询员工</a>
+        <a href="#/app/main/listEmployee" class="item" menu-close ng-click="openChildrenTab(3)" ng-show="isAdminUser()">查询员工</a>
         <a href="#/app/main/updataInfo" class="item" menu-close ng-click="openChildrenTab(4)">门店信息</a>
       </ul>
     </ion-content>

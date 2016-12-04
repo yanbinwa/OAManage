@@ -23,7 +23,9 @@ public interface MessageServiceSpring
     public static final String RESPONSECODE = "responseCode";
     
     public static final String ROOT_URL = "RootUrl";
+    public static final String LOGIN = "Login";
     public static final String USER_LOGIN = "UserLogin";
+    public static final String USER_LOGOUT = "UserLogout";
     public static final String USER_SIGN = "UserSign";
     
     public static final String QUEUE_CAPACITY = "MessageService_QueueCapacity";
@@ -60,5 +62,5 @@ public interface MessageServiceSpring
     public boolean isSessionIdOnLine(String sessionId);
     public boolean isSessionExpired(String sessionId);
     public boolean reLoginSession(Session session);
-       
+    public boolean logoutSession(Session session); 
 }

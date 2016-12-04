@@ -37,7 +37,7 @@ import net.sf.json.JSONObject;
 /**
  * Manage the session, operate the message to get rest result
  * @author yanbinwa
- *
+ * 
  */
 
 @Service("messageServiceSpring")
@@ -250,6 +250,19 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             return false;
         }
         sessionIdToUserMap.put(session.getSessionId(), user);
+        return ret;
+    }
+    
+    @Override
+    public boolean logoutSession(Session session)
+    {
+        // TODO Auto-generated method stub
+        boolean ret = changeSessionType(session, session.getSessionType(), SessionType.NoneAuthorizationSession);
+        if (!ret)
+        {
+            return false;
+        }
+        sessionIdToUserMap.remove(session.getSessionId());
         return ret;
     }
 
