@@ -1,5 +1,7 @@
 package com.yanbinwa.OASystem.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +52,12 @@ public class LoginController
     public @ResponseBody String changePassword(@RequestBody JSONObject payLoad) 
     {
         return loginService.changePassword(payLoad);
+    }
+    
+    @RequestMapping(value = LOGIN_ROOT_URL + "/verifyUserSign", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String verifyUserSign(@RequestBody List<JSONObject> payLoad) 
+    {
+        return loginService.verifyUserSign(payLoad);
     }
     
 }

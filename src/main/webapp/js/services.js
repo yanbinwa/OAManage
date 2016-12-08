@@ -3,8 +3,8 @@ angular.module('ionicApp.services', [])
 .factory('WebsocketClient', function() {
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
-	//var SERVER_URL = "wss://localhost:8443/OAManage/websocket/websocketSpring";
-	var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
+	var SERVER_URL = "wss://192.168.1.104:8443/OAManage/websocket/websocketSpring";
+	//var SERVER_URL = "wss://10.140.8.30:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
 	var INVALIDATE_SESSIONID = -1;
@@ -222,6 +222,34 @@ angular.module('ionicApp.services', [])
 		},
 		addNotification: function(notification) {
 			notifications.push(notification);
+		},
+		isEmployeeSignNotify: function(notification) {
+			if (notification.type != "UserSignVerify") {
+				return false;
+			}
+			if (notification.userObject == null) {
+				return false;
+			}
+			if (notification.userObject.sex == null) {
+				return false;
+			}
+			else {
+				return true;
+			}
+		},
+		isStoreSignNotify: function(notification) {
+			if (notification.type != "UserSignVerify") {
+				return false;
+			}
+			if (notification.userObject == null) {
+				return false;
+			}
+			if (notification.userObject.sex == null) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 })
@@ -272,6 +300,17 @@ angular.module('ionicApp.services', [])
 				return false;
 			}
 			if (userInfo.user.authType == 'Admin') {
+				return true;
+			}
+			else {
+				return false;
+			}
+		},
+		isNormalUser: function() {
+			if (userInfo.user == null) {
+				return false;
+			}
+			if (userInfo.user.authType == 'Normal') {
 				return true;
 			}
 			else {

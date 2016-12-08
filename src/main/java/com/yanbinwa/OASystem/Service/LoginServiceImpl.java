@@ -1,5 +1,7 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
@@ -270,6 +272,19 @@ public class LoginServiceImpl implements LoginService
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public String verifyUserSign(List<JSONObject> payLoad)
+    {
+        // TODO Auto-generated method stub
+        List<User> userList = new ArrayList<User>();
+        for(JSONObject jsObj : payLoad)
+        {
+            User user = (User)JSONObject.toBean(jsObj, User.class);
+            userList.add(user);
+        }
+        return userService.verifyUserSign(userList);
     }
 
 }

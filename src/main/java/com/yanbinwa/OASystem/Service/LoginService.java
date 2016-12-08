@@ -1,5 +1,7 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.util.List;
+
 import com.yanbinwa.OASystem.Model.User;
 
 import net.sf.json.JSONObject;
@@ -28,4 +30,5 @@ public interface LoginService
     public User userLogin(JSONObject payLoad);
     public String changePassword(JSONObject payLoad);
     public String userLogout(JSONObject payLoad);
+    public String verifyUserSign(List<JSONObject> payLoad);
 }

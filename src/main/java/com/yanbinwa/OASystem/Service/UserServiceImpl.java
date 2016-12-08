@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yanbinwa.OASystem.Dao.UserDao;
 import com.yanbinwa.OASystem.Model.User;
+import com.yanbinwa.OASystem.Model.User.UserState;
 
 @Service("userService")
 @Transactional
@@ -48,6 +49,22 @@ public class UserServiceImpl implements UserService
             return "oldPassword is not correct";
         }
         user.setPassword(newPassword);
+        return "";
+    }
+
+    @Override
+    public String verifyUserSign(List<User> userList)
+    {
+        // TODO Auto-generated method stub
+        if (userList == null)
+        {
+            return "the verify list is null";
+        }
+        for(User userTmp : userList)
+        {
+            User user = dao.findById(userTmp.getId());
+            user.setUserState(UserState.Authorization);
+        }
         return "";
     }
 

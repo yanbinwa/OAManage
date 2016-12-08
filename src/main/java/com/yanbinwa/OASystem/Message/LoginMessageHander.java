@@ -68,6 +68,16 @@ public class LoginMessageHander extends MessageHander
         }
     }
     
+    private void handleVerifySignMessage(String responsePayload)
+    {
+        if (!responsePayload.equals(""))
+        {
+            message.setResponsePayLoad("Logout Error");
+            message.setResponseCode(HttpUtils.RESPONSE_ERROR);
+            return;
+        }
+    }
+    
     @Override
     protected void handleHttpResult(HttpResult httpResult)
     {
@@ -90,6 +100,10 @@ public class LoginMessageHander extends MessageHander
         else if(messageProcessorService.isWhatUrl(MessageServiceSpring.USER_LOGOUT, message.getUrl()))
         {
             handleLogoutMessage(httpResult.getResponse());
+        }
+        else if(messageProcessorService.isWhatUrl(MessageServiceSpring.USER_VERIFY_SIGN, message.getUrl()))
+        {
+            handleVerifySignMessage(httpResult.getResponse());
         }
     }
 }

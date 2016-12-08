@@ -27,6 +27,7 @@ public interface MessageServiceSpring
     public static final String USER_LOGIN = "UserLogin";
     public static final String USER_LOGOUT = "UserLogout";
     public static final String USER_SIGN = "UserSign";
+    public static final String USER_VERIFY_SIGN = "VerifyUserSign";
     
     public static final String QUEUE_CAPACITY = "MessageService_QueueCapacity";
     public static final String CORE_POOL_SIZE = "MessageService_CorePoolSize";

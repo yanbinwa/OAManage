@@ -13,4 +13,6 @@ public interface UserService
     List<User> findNoneAuthorizationUser();
     
     String changePassword(int id, String oldPassword, String newPassword);
+    
+    String verifyUserSign(List<User> userList);
 }
