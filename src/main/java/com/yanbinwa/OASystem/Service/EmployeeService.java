@@ -3,6 +3,7 @@ package com.yanbinwa.OASystem.Service;
 import java.util.List;
 
 import com.yanbinwa.OASystem.Model.Employee;
+import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 
 public interface EmployeeService
 {
@@ -23,4 +24,10 @@ public interface EmployeeService
     void deleteEmployee(Employee employee);
     
     Employee vailadeAndGetEmployeeFromPayLoad(Object employeeObj);
+    
+    void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo);
+    
+    String employeeCheckin(Employee employee);
+    
+    String employeeCheckout(Employee employee);
 }

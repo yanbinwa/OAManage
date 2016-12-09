@@ -33,6 +33,8 @@ public class Employee
     @Column(name = "STOREID", nullable = false)
     private int storeId;
     
+    @Column(name = "EMPLOYEEDYNAMICINFOID", nullable = false)
+    private int employeeDynamicInfoId = -1;
     
     public Employee(String name, String sex, long birthday, int age, String tel, String identityId)
     {
@@ -44,6 +46,7 @@ public class Employee
         this.tel = tel;
         this.identityId = identityId;
         this.storeId = -1;
+        this.employeeDynamicInfoId = -1;
     }
     
     public Employee(int id, String name, String sex, long birthday, int age, String tel, String identityId, int storeId)
@@ -56,6 +59,7 @@ public class Employee
         this.tel = tel;
         this.identityId = identityId;
         this.storeId = storeId;
+        this.employeeDynamicInfoId = -1;
     }
     
     public Employee()
@@ -141,6 +145,16 @@ public class Employee
     public void setStoreId(int storeId)
     {
         this.storeId = storeId;
+    }
+    
+    public int getEmployeeDynamicInfoId()
+    {
+        return employeeDynamicInfoId;
+    }
+    
+    public void setEmployeeDynamicInfoId(int employeeDynamicInfoId)
+    {
+        this.employeeDynamicInfoId = employeeDynamicInfoId;
     }
     
 

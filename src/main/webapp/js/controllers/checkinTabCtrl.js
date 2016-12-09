@@ -1,6 +1,7 @@
 angular.module('ionicApp.controllers')
 
-.controller('CheckinTabCtrl', function($scope, $state, WebsocketClient, UserInfo) {
+.controller('CheckinTabCtrl', function($scope, $state, WebsocketClient, UserInfo, StoreInfo) {
+	
 	$scope.$watch('$viewContentLoaded', function(event) {
 
 	})
@@ -21,11 +22,16 @@ angular.module('ionicApp.controllers')
 	
 	$scope.$on("CheckinTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
+		// fetch the ORCode
 		if (functionKey == 'getORCodeKey') {
 			getORCodeKeyResponse(msg);
 		}
 		else if(functionKey == 'openTab') {
 			openTabResponse(msg);
+		}
+		// push the ORCode
+		else if(functionKey == 'oRCodeKeyUpdate') {
+			oRCodeKeyUpdateResponse(msg);
 		}
 	});
 
@@ -44,20 +50,28 @@ angular.module('ionicApp.controllers')
 	}
 	
 	var getORCodeKeyResponse = function(msg) {
-		showORCode(msg);
+		var responseCode = msg.responseCode;
+		if (responseCode != WebsocketClient.getResponseOk()) {
+			alert("获取二维码失败");
+			return;
+		}
+		showORCode(msg.responsePayLoad);
 	}
 	
 	var openTabResponse = function(msg) {
 		getORCodeKey();
 	}
 	
-	var showORCode = function(msg) {
+	var oRCodeKeyUpdateResponse = function(msg) {
 		var responseCode = msg.responseCode;
 		if (responseCode != WebsocketClient.getResponseOk()) {
-			alert("获取二维码失败");
 			return;
 		}
-		var oRCodeKey = msg.responsePayLoad;
+		showORCode(msg.responsePayLoad);
+	}
+	
+	var showORCode = function(oRCodeKey) {
+		oRCodeKey = oRCodeKey + "_" + StoreInfo.getStoreInfo().id;
 		$('#code').empty();
 		$('#code').qrcode(oRCodeKey);
 		$scope.$apply();
@@ -69,4 +83,5 @@ angular.module('ionicApp.controllers')
 	}
 	
 	getORCodeKey();
+	
 });

@@ -53,8 +53,10 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     
     private static final Logger logger = Logger.getLogger(MessageServiceSpringImpl.class);
     
-    private BlockingQueue<Message> notifyAdminQueue;
-    private BlockingQueue<Message> notifyNormalQueue;
+    private BlockingQueue<Message> notifyAdminEmployeeQueue;
+    private BlockingQueue<Message> notifyNormalEmployeeQueue;
+    private BlockingQueue<Message> notifyAdminStoreQueue;
+    private BlockingQueue<Message> notifyNormalStoreQueue;
     private ThreadPoolTaskExecutor poolTaskExecutor;
         
     @Autowired
@@ -93,10 +95,14 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         poolTaskExecutor.setKeepAliveSeconds((Integer)propertyService.getProperty(KEEP_ALIVE_SECONDS, Integer.class));
         poolTaskExecutor.initialize();
         
-        notifyAdminQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_ADMIN_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyAdminQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_QUEUE_FILENAME);
-        notifyNormalQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(NOTIFY_NORMAL_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyNormalQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_QUEUE_FILENAME);
+        notifyAdminEmployeeQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyAdminEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
+        notifyNormalEmployeeQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyNormalEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
+        notifyAdminStoreQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyAdminStoreQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
+        notifyNormalStoreQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_SIZE, Integer.class));
+        QueuePersistUtil.loadQueue(notifyNormalStoreQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);
         
         new Thread(new Runnable() {
 
@@ -104,7 +110,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             public void run()
             {
                 // TODO Auto-generated method stub
-                notifyAdminUser();
+                notifyAdminEmployeeUser();
             }
             
         }).start();
@@ -115,7 +121,29 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             public void run()
             {
                 // TODO Auto-generated method stub
-                notifyNormalUser();
+                notifyNormalEmployeeUser();
+            }
+            
+        }).start();
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                // TODO Auto-generated method stub
+                notifyAdminStoreUser();
+            }
+            
+        }).start();
+        
+        new Thread(new Runnable() {
+
+            @Override
+            public void run()
+            {
+                // TODO Auto-generated method stub
+                notifyNormalStoreUser();
             }
             
         }).start();
@@ -135,8 +163,10 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     @PreDestroy
     public void destroy()
     {
-        QueuePersistUtil.persistQueue(notifyAdminQueue, Message.class, NOTIFY_ADMIN_QUEUE_FILENAME);
-        QueuePersistUtil.persistQueue(notifyNormalQueue, Message.class, NOTIFY_NORMAL_QUEUE_FILENAME);
+        QueuePersistUtil.persistQueue(notifyAdminEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
+        QueuePersistUtil.persistQueue(notifyNormalEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
+        QueuePersistUtil.persistQueue(notifyAdminStoreQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
+        QueuePersistUtil.persistQueue(notifyNormalStoreQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);        
     }
     
     @Override
@@ -487,27 +517,41 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     }
 
     @Override
-    public boolean notifiyAdminUser(Message message)
+    public boolean notifiyAdminEmployeeUser(Message message)
     {
         // TODO Auto-generated method stub
-        return notifyAdminQueue.add(message);
+        return notifyAdminEmployeeQueue.add(message);
     }
 
     @Override
-    public boolean notifiyNormalUser(Message message)
+    public boolean notifiyNormalEmployeeUser(Message message)
     {
         // TODO Auto-generated method stub
-        return notifyNormalQueue.add(message);
+        return notifyNormalEmployeeQueue.add(message);
     }
     
-    private void notifyAdminUser()
+    @Override
+    public boolean notifiyAdminStoreUser(Message message)
+    {
+        // TODO Auto-generated method stub
+        return notifyAdminStoreQueue.add(message);
+    }
+    
+    @Override
+    public boolean notifiyNormalStoreUser(Message message)
+    {
+        // TODO Auto-generated method stub
+        return notifyNormalStoreQueue.add(message);
+    }
+    
+    private void notifyAdminEmployeeUser()
     {
         while(true)
         {
             Message message = null;
             try
             {
-                message = notifyAdminQueue.poll(1000, TimeUnit.MILLISECONDS);
+                message = notifyAdminEmployeeQueue.poll(1000, TimeUnit.MILLISECONDS);
             } 
             catch (InterruptedException e)
             {
@@ -518,19 +562,19 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             {
                 continue;
             }
-            NotifyAdminUserHelper notifyAdminUserHelper = new NotifyAdminUserHelper(message);
-            poolTaskExecutor.execute(notifyAdminUserHelper);
+            NotifyAdminEmployeeUserHelper notifyAdminEmployeeUserHelper = new NotifyAdminEmployeeUserHelper(message);
+            poolTaskExecutor.execute(notifyAdminEmployeeUserHelper);
         }
     }
     
-    private void notifyNormalUser()
+    private void notifyNormalEmployeeUser()
     {
         while(true)
         {
             Message message = null;
             try
             {
-                message = notifyNormalQueue.poll(1000, TimeUnit.MILLISECONDS);
+                message = notifyNormalEmployeeQueue.poll(1000, TimeUnit.MILLISECONDS);
             } 
             catch (InterruptedException e)
             {
@@ -541,8 +585,54 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             {
                 continue;
             }
-            NotifyNormalUserHelper notifyNormalUserHelper = new NotifyNormalUserHelper(message);
+            NotifyNormalEmployeeUserHelper notifyNormalUserHelper = new NotifyNormalEmployeeUserHelper(message);
             poolTaskExecutor.execute(notifyNormalUserHelper);
+        }
+    }
+    
+    private void notifyAdminStoreUser()
+    {
+        while(true)
+        {
+            Message message = null;
+            try
+            {
+                message = notifyAdminStoreQueue.poll(1000, TimeUnit.MILLISECONDS);
+            } 
+            catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(message == null)
+            {
+                continue;
+            }
+            NotifyAdminStoreUserHelper notifyAdminStoreUserHelper = new NotifyAdminStoreUserHelper(message);
+            poolTaskExecutor.execute(notifyAdminStoreUserHelper);
+        }
+    }
+    
+    private void notifyNormalStoreUser()
+    {
+        while(true)
+        {
+            Message message = null;
+            try
+            {
+                message = notifyNormalStoreQueue.poll(1000, TimeUnit.MILLISECONDS);
+            } 
+            catch (InterruptedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if(message == null)
+            {
+                continue;
+            }
+            NotifyNormalStoreUserHelper notifyNormalStoreUserHelper = new NotifyNormalStoreUserHelper(message);
+            poolTaskExecutor.execute(notifyNormalStoreUserHelper);
         }
     }
     
@@ -579,12 +669,12 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         
     }
     
-    class NotifyAdminUserHelper implements Runnable
+    class NotifyAdminEmployeeUserHelper implements Runnable
     {
         
         Message message;
         
-        public NotifyAdminUserHelper(Message message)
+        public NotifyAdminEmployeeUserHelper(Message message)
         {
             this.message = message;
         }
@@ -602,7 +692,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
                     Thread.sleep(5000);
                     if (adminEmployeeSession == null || adminEmployeeSession.isEmpty())
                     {
-                        notifiyAdminUser(message);
+                        notifiyAdminEmployeeUser(message);
                         return;
                     }
                 } 
@@ -628,12 +718,52 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         }
     }
     
-    class NotifyNormalUserHelper implements Runnable
+    class NotifyNormalEmployeeUserHelper implements Runnable
     {
         
         Message message;
         
-        public NotifyNormalUserHelper(Message message)
+        public NotifyNormalEmployeeUserHelper(Message message)
+        {
+            this.message = message;
+        }
+        
+        @Override
+        public void run()
+        {
+            // TODO Auto-generated method stub
+            // find all session for adminUser or normalUser and send the message
+            
+        }
+        
+    }
+    
+    class NotifyAdminStoreUserHelper implements Runnable
+    {
+        
+        Message message;
+        
+        public NotifyAdminStoreUserHelper(Message message)
+        {
+            this.message = message;
+        }
+        
+        @Override
+        public void run()
+        {
+            // TODO Auto-generated method stub
+            // find all session for adminUser or normalUser and send the message
+            
+        }
+        
+    }
+    
+    class NotifyNormalStoreUserHelper implements Runnable
+    {
+        
+        Message message;
+        
+        public NotifyNormalStoreUserHelper(Message message)
         {
             this.message = message;
         }
@@ -653,6 +783,13 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     {
         // TODO Auto-generated method stub
         return !sessionIdToAgingTimeMap.containsKey(sessionId);
+    }
+
+    @Override
+    public User getUserBySessionId(String sessionId)
+    {
+        // TODO Auto-generated method stub
+        return sessionIdToUserMap.get(sessionId);
     }
     
 }

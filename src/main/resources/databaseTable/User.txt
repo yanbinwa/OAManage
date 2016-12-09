@@ -6,5 +6,6 @@ create table user (
    authType   TINYINT  NOT NULL,
    userState  TINYINT  NOT NULL,
    userId     TINYINT  NOT NULL,
+   userDynamicInfoId   INT  NOT NULL,
    PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

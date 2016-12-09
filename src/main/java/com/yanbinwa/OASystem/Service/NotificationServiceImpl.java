@@ -114,6 +114,10 @@ public class NotificationServiceImpl implements NotificationService, EventListen
             handleUserSignEvent(event);
             break;
             
+        case ORCode:
+            handleORCodeUpdateEvent(event);
+            break;
+            
         default:
             break;
         }
@@ -153,11 +157,40 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         message.setResponseCode(responseCode);
         message.setResponsePayLoad(jsonObj.toString());
         
-        boolean ret = messageServiceSpring.notifiyAdminUser(message);
+        boolean ret = messageServiceSpring.notifiyAdminEmployeeUser(message);
         if (!ret)
         {
             logger.error("Can not notify the message");
         }
+    }
+    
+    private void handleORCodeUpdateEvent(Event event)
+    {
+        String oRCodeKey = (String)event.getPayLoad();
+        if (oRCodeKey == null)
+        {
+            logger.error("ORCode is null");
+            return;
+        }
+        Message message = new Message();
+        String routeKey = (String)propertyService.getProperty(ORCodeService.ORCODEUPDATE_ROUTEKEY, String.class);
+        String functionKey = (String)propertyService.getProperty(ORCodeService.ORCODEUPDATE_FUNCTIONKEY, String.class);
+        int responseCode = HttpUtils.RESPONSE_OK;
+        message.setRouteKey(routeKey);
+        message.setFunctionKey(functionKey);
+        message.setResponseCode(responseCode);
+        message.setResponsePayLoad(oRCodeKey);
+        boolean ret = messageServiceSpring.notifiyAdminEmployeeUser(message);
+        if (!ret)
+        {
+            logger.error("Can not send the ORCode update message to admin");
+        }
+        ret = messageServiceSpring.notifiyNormalEmployeeUser(message);
+        if (!ret)
+        {
+            logger.error("Can not send the ORCode update message to normal");
+        }
+        
     }
     
     @Override

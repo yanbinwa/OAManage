@@ -33,8 +33,11 @@ public interface MessageServiceSpring
     public static final String CORE_POOL_SIZE = "MessageService_CorePoolSize";
     public static final String MAX_POOL_SIZE = "MessageService_MaxPoolSize";
     public static final String KEEP_ALIVE_SECONDS = "MessageService_KeepAliveSeconds";
-    public static final String NOTIFY_ADMIN_QUEUE_SIZE = "MessageService_NotifyAdminQueueSize";
-    public static final String NOTIFY_NORMAL_QUEUE_SIZE = "MessageService_NotifyNormalQueueSize";
+    public static final String NOTIFY_ADMIN_EMPLOYEE_QUEUE_SIZE = "MessageService_NotifyAdminEmployeeQueueSize";
+    public static final String NOTIFY_NORMAL_EMPLOYEE_QUEUE_SIZE = "MessageService_NotifyNormalEmployeeQueueSize";
+    public static final String NOTIFY_ADMIN_STORE_QUEUE_SIZE = "MessageService_NotifyAdminStoreQueueSize";
+    public static final String NOTIFY_NORMAL_STORE_QUEUE_SIZE = "MessageService_NotifyNormalStoreQueueSize";
+    
     public static final String NOTIFY_SESSION_AGE_TIME = "MessageService_SessionAgeTime";
     
     public static final String USERLOGIN_ROUTEKEY = "MessageService_UserLogin_RouteKey";
@@ -42,8 +45,10 @@ public interface MessageServiceSpring
     public static final String USERSIGN_ROUTEKEY = "MessageService_UserSign_RouteKey";
     public static final String USERSIGN_FUNCTIONKEY = "MessageService_UserSign_FunctionKey";
     
-    public static final String NOTIFY_ADMIN_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Admin_File.txt";
-    public static final String NOTIFY_NORMAL_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/" + "messageService_Normal_File.txt";
+    public static final String NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Admin_Employee_File.txt";
+    public static final String NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Normal_Employee_File.txt";
+    public static final String NOTIFY_ADMIN_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Admin_Store_File.txt";
+    public static final String NOTIFY_NORMAL_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Normal_Store_File.txt";
     
     public static final String GET_SESSION_ID = "getSessionId";
     
@@ -57,11 +62,15 @@ public interface MessageServiceSpring
     public boolean isWhatUrl(String urlName, String url);
     public SessionType getSessionTypeFromUser(User user);
     
-    public boolean notifiyAdminUser(Message message);
-    public boolean notifiyNormalUser(Message message);
-    
+    public boolean notifiyAdminEmployeeUser(Message message);
+    public boolean notifiyNormalEmployeeUser(Message message);
+    public boolean notifiyAdminStoreUser(Message message);
+    public boolean notifiyNormalStoreUser(Message message);
+        
     public boolean isSessionIdOnLine(String sessionId);
     public boolean isSessionExpired(String sessionId);
     public boolean reLoginSession(Session session);
     public boolean logoutSession(Session session); 
+    
+    public User getUserBySessionId(String sessionId);
 }

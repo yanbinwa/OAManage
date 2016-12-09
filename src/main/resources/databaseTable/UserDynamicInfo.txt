@@ -1,0 +1,7 @@
+create table userDynamicInfo (
+   id INT NOT NULL,
+   loginTime BIGINT NOT NULL,
+   logoutTime BIGINT NOT NULL,
+   loginStatus TINYINT NOT NULL,
+   PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

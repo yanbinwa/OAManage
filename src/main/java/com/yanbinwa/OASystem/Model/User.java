@@ -47,6 +47,9 @@ public class User
     @Column(name = "USERID", nullable = false)
     private int userId = -1;
     
+    @Column(name = "USERDYNAMICINFOID", nullable = false)
+    private int userDynamicInfoId = -1;
+    
     public User()
     {
         
@@ -61,6 +64,7 @@ public class User
         this.authType = authType;
         this.userState = userState;
         this.userId = userId;
+        this.userDynamicInfoId = -1;
     }
     
     public void setId(int id)
@@ -134,6 +138,16 @@ public class User
     public int getUserId()
     {
         return this.userId;
+    }
+    
+    public void setUserDynamicInfoId(int userDynamicInfoId)
+    {
+        this.userDynamicInfoId = userDynamicInfoId;
+    }
+    
+    public int getUserDynamicInfoId()
+    {
+        return userDynamicInfoId;
     }
     
     @Override

@@ -11,11 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yanbinwa.OASystem.Model.Employee;
+import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
+import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
 import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.AuthType;
 import com.yanbinwa.OASystem.Model.User.UserState;
 import com.yanbinwa.OASystem.Model.User.UserType;
+import com.yanbinwa.OASystem.Model.UserDynamicInfo;
+import com.yanbinwa.OASystem.Model.UserDynamicInfo.LoginStatus;
 
 import net.sf.json.JSONObject;
 
@@ -36,6 +40,9 @@ public class LoginServiceImpl implements LoginService
     
     @Autowired
     private PropertyService propertyService;
+    
+    @Autowired
+    private MessageServiceSpring messageServiceSpring;
     
     private AtomicInteger atomicUserId;
     private AtomicInteger atomicEmployeeId;
@@ -154,9 +161,13 @@ public class LoginServiceImpl implements LoginService
         employee.setStoreId(storeId);
         
         user.setUserId(employee.getId());
+        UserDynamicInfo userDynamicInfo = createUserDynamicInfo(user);
         userService.saveUser(user);
-        employeeService.saveEmployee(employee);
+        userService.saveUserDynamicInfo(userDynamicInfo);
         
+        EmployeeDynamicInfo employeeDynamicInfo = createEmployeeDynamicInfo(employee);
+        employeeService.saveEmployee(employee);
+        employeeService.saveEmployeeDynamicInfo(employeeDynamicInfo);
         return true;
     }
     
@@ -176,6 +187,26 @@ public class LoginServiceImpl implements LoginService
         return false;
     }
 
+    private UserDynamicInfo createUserDynamicInfo(User user)
+    {
+        UserDynamicInfo userDynamicInfo = new UserDynamicInfo();
+        userDynamicInfo.setId(user.getId());
+        userDynamicInfo.setLoginTime(-1);
+        userDynamicInfo.setLoginStatus(LoginStatus.unLogin);
+        user.setUserDynamicInfoId(userDynamicInfo.getId());
+        return userDynamicInfo;
+    }
+    
+    private EmployeeDynamicInfo createEmployeeDynamicInfo(Employee employee)
+    {
+        EmployeeDynamicInfo employeeDynamicInfo = new EmployeeDynamicInfo();
+        employeeDynamicInfo.setId(employee.getId());
+        employeeDynamicInfo.setCheckinTime(-1);
+        employeeDynamicInfo.setCheckinStatus(CheckinStatus.unCheckin);
+        employee.setEmployeeDynamicInfoId(employeeDynamicInfo.getId());
+        return employeeDynamicInfo;
+    }
+    
     @Override
     public User userSign(JSONObject payLoad)
     {
@@ -226,6 +257,11 @@ public class LoginServiceImpl implements LoginService
             return null;
         }
         
+        if (user.getUserState() != UserState.Authorization)
+        {
+            return null;
+        }
+        
         String userPassword = payLoad.getString(LoginService.USERPASSWORD);
         if (!userPassword.equals(user.getPassword()))
         {
@@ -254,6 +290,7 @@ public class LoginServiceImpl implements LoginService
             return null;
         }
         
+        userService.userLogin(user);
         return user;
     }
 
@@ -271,7 +308,13 @@ public class LoginServiceImpl implements LoginService
     public String userLogout(JSONObject payLoad)
     {
         // TODO Auto-generated method stub
-        return null;
+        String sessionId = payLoad.getString(LoginService.SESSION_ID);
+        User user = messageServiceSpring.getUserBySessionId(sessionId);
+        if (user != null)
+        {
+            userService.userLogout(user);
+        }
+        return "";
     }
 
     @Override

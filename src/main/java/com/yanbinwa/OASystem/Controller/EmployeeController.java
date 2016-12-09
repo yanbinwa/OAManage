@@ -48,4 +48,16 @@ public class EmployeeController
         employeeService.deleteEmployee(employee);
         return employee;
     }
+    
+    @RequestMapping(value = EMPLOYEE_ROOT_URL + "/employeCheckin", method = RequestMethod.POST)
+    public @ResponseBody String employeCheckin(@RequestBody Employee employee)
+    {
+        return employeeService.employeeCheckin(employee);
+    }
+    
+    @RequestMapping(value = EMPLOYEE_ROOT_URL + "/employeCheckout", method = RequestMethod.POST)
+    public @ResponseBody String employeCheckout(@RequestBody Employee employee)
+    {
+        return employeeService.employeeCheckout(employee);
+    }
 }

@@ -8,7 +8,7 @@ public class Event implements Serializable
     
     public enum EventType 
     {
-        Sign, Login, Order
+        Sign, Login, Order, ORCode
     }
     
     private static final long serialVersionUID = 1L;

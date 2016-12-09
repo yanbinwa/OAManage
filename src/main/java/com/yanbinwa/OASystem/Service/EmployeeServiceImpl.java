@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yanbinwa.OASystem.Dao.EmployeeDao;
+import com.yanbinwa.OASystem.Dao.EmployeeDynamicInfoDao;
 import com.yanbinwa.OASystem.Model.Employee;
+import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
+import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
 
 import net.sf.json.JSONObject;
 
@@ -20,35 +23,37 @@ public class EmployeeServiceImpl implements EmployeeService
     private static final Logger logger = Logger.getLogger(EmployeeServiceImpl.class);
     
     @Autowired
-    private EmployeeDao dao;
+    private EmployeeDao employeeDao;
     
+    @Autowired
+    private EmployeeDynamicInfoDao employeeDynamicInfoDao;
     
     @Override
     public Employee findById(int id)
     {
         // TODO Auto-generated method stub
-        return dao.findById(id);
+        return employeeDao.findById(id);
     }
 
     @Override
     public void saveEmployee(Employee employee)
     {
         // TODO Auto-generated method stub
-        dao.saveEmployee(employee);
+        employeeDao.saveEmployee(employee);
     }
 
     @Override
     public List<Employee> findAllEmployees()
     {
         // TODO Auto-generated method stub
-        return dao.findAllEmployees();
+        return employeeDao.findAllEmployees();
     }
 
     @Override
     public void deleteEmployee(Employee employee)
     {
         // TODO Auto-generated method stub
-        dao.deleteEmployee(employee);
+        employeeDao.deleteEmployee(employee);
     }
 
     @Override
@@ -99,6 +104,47 @@ public class EmployeeServiceImpl implements EmployeeService
         employee.setIdentityId(identityId);
         
         return employee;
+    }
+
+    @Override
+    public void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo)
+    {
+        // TODO Auto-generated method stub
+        employeeDynamicInfoDao.saveEmployeeDynamicInfo(employeeDynamicInfo);
+    }
+
+    @Override
+    public String employeeCheckin(Employee employee)
+    {
+        // TODO Auto-generated method stub
+        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
+        if (employeeDynamicInfo != null)
+        {
+            employeeDynamicInfo.setCheckinTime(System.currentTimeMillis());
+            employeeDynamicInfo.setCheckinStatus(CheckinStatus.checkin);
+            return "";
+        }
+        else
+        {
+            return "Error to checkin";
+        }
+    }
+
+    @Override
+    public String employeeCheckout(Employee employee)
+    {
+        // TODO Auto-generated method stub
+        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
+        if (employeeDynamicInfo != null)
+        {
+            employeeDynamicInfo.setCheckoutTime(System.currentTimeMillis());
+            employeeDynamicInfo.setCheckinStatus(CheckinStatus.unCheckin);
+            return "";
+        }
+        else
+        {
+            return "Error to checkout";
+        }
     }
 
 }

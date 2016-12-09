@@ -1,5 +1,5 @@
 create table employee (
-   id TINYINT NOT NULL,
+   id INT NOT NULL,
    name  VARCHAR(20) NOT NULL,
    sex   VARCHAR(10) NOT NULL,
    birthday   BIGINT  NOT NULL, 
@@ -7,6 +7,7 @@ create table employee (
    tel   VARCHAR(20) NOT NULL,
    identityId  VARCHAR(20) NOT NULL,
    storeId  INT,
+   employeeDynamicInfoId INT,
    PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
