@@ -81,13 +81,18 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
     })
     .state('login', {
       url: "/login",
-      templateUrl: "templates/login.html",	
-      controller: 'LoginTabCtrl'
+      templateUrl: "templates/employeeLogin.html",	
+      controller: 'EmployeeLoginTabCtrl'
     })
+//    .state('sign', {
+//      url: "/sign",
+//      templateUrl: "templates/employeeSign.html",	
+//      controller: 'EmployeeSignTabCtrl'
+//    })
     .state('sign', {
       url: "/sign",
-      templateUrl: "templates/sign.html",	
-      controller: 'SignTabCtrl'
+      templateUrl: "templates/storeSign.html",	
+      controller: 'StoreSignTabCtrl'
     });
   
   $urlRouterProvider.otherwise("/login");

@@ -6,6 +6,8 @@ public interface PropertyService
     
     public static final String SYSTEM_PROPERTIES_PATH = SYSTEM_RESOURCE_DIR + "/" + "system.properties";
     
+    public static final String RESPONSE_JSON_UTF8 = "application/json;charset=UTF-8";
+    
     @SuppressWarnings("rawtypes")
     public Object getProperty(String key, Class clazz);
     

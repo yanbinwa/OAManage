@@ -3,8 +3,8 @@ angular.module('ionicApp.services', [])
 .factory('WebsocketClient', function() {
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
-	//var SERVER_URL = "wss://192.168.1.104:8443/OAManage/websocket/websocketSpring";
-	var SERVER_URL = "wss://10.140.8.30:8443/OAManage/websocket/websocketSpring";
+	var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
+	//var SERVER_URL = "wss://10.140.8.20:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
 	var INVALIDATE_SESSIONID = -1;
@@ -112,6 +112,7 @@ angular.module('ionicApp.services', [])
 		address: '上海市徐汇区宜山路926号新思大楼',
 		tel: '13222085556'
 	};
+	
 	return {
 		getStoreInfo: function() {
 			return storeInfo;
@@ -129,6 +130,22 @@ angular.module('ionicApp.services', [])
 		removeStoreInfo: function(key) {
 			window.localStorage.removeItem(key + "storeInfo");
 		},
+	};
+})
+
+.factory('Store', function() {
+	
+	var storeTemplate = {
+		name: null,
+		address: null,
+		tel: null
+	};
+	
+	return {
+		getStoreTemplate: function() {
+			var newStore = JSON.parse(JSON.stringify(storeTemplate));
+			return newStore;
+		}
 	};
 })
 
@@ -171,7 +188,7 @@ angular.module('ionicApp.services', [])
 .factory('User', function() {
 	var userTemplate = {
 		authType: '普通用户',
-		userType: 'employee'
+		userType: 'store'
 	};
 	
 	return {

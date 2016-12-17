@@ -5,6 +5,10 @@ angular.module('ionicApp.controllers')
     $scope.$watch('$viewContentLoaded', function(event) {
 
 	})
+			
+	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
+		alert("signOpen");
+	})
 	
 	$scope.infoNum = Notification.getNotificationsSize();
 	$scope.session = WebsocketClient.getSession(onOpen, onClose, onMessage);

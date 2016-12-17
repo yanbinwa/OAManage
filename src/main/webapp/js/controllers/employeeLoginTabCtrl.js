@@ -1,8 +1,8 @@
 angular.module('ionicApp.controllers')
 
-.controller('LoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient, UserInfo) {
+.controller('EmployeeLoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient, UserInfo) {
     
-	$scope.$on("LoginTabCtrl", function(event, msg) {
+	$scope.$on("EmployeeLoginTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
 		if (functionKey == 'openTab') {
 			openTabResponse();
@@ -36,7 +36,7 @@ angular.module('ionicApp.controllers')
     }
     
     var sendMsg = function(msg) {
-		msg.routeKey = 'LoginTabCtrl';
+		msg.routeKey = 'EmployeeLoginTabCtrl';
 		$scope.$emit("MainCtrl", msg);
 	}
     

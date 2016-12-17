@@ -1,9 +1,5 @@
 package com.yanbinwa.OASystem.Utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Queue;
@@ -28,17 +24,9 @@ public class QueuePersistUtil
         {
             return;
         }
-        String ret = "";
         try
         {
-            FileReader read = new FileReader(filename);
-            BufferedReader bufferedReader = new BufferedReader(read);
-            String line = null;
-            while((line = bufferedReader.readLine()) != null)
-            {
-                ret += line;
-            }
-            read.close();
+            String ret = FileUtils.readJsonFile(filename);
             if (ret == "")
             {
                 return;
@@ -53,7 +41,7 @@ public class QueuePersistUtil
                 queue.add(obj);
             }      
         } 
-        catch (IOException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+        catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
         {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -71,24 +59,13 @@ public class QueuePersistUtil
         {
             return;
         }
-        try
+        JSONArray array = new JSONArray();
+        for(Object obj : queue.toArray())
         {
-            JSONArray array = new JSONArray();
-            for(Object obj : queue.toArray())
-            {
-                JsonPersist jsonPersist = (JsonPersist)obj;
-                JSONObject jsonObject = jsonPersist.getJsonObjectFromObject();
-                array.add(jsonObject);
-            }
-            FileWriter writer = new FileWriter(filename);
-            writer.write(array.toString());
-            writer.close();
-        } 
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            JsonPersist jsonPersist = (JsonPersist)obj;
+            JSONObject jsonObject = jsonPersist.getJsonObjectFromObject();
+            array.add(jsonObject);
         }
-        
+        FileUtils.writeFile(filename, array.toString());
     }
 }

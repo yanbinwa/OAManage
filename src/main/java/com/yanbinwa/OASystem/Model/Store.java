@@ -21,6 +21,18 @@ public class Store
     @Column(name = "TEL", nullable = false)
     private String tel;
     
+    @Column(name = "PROVINCEID", nullable = false)
+    private String provinceId;
+    
+    @Column(name = "CITYID", nullable = false)
+    private String cityId;
+    
+    @Column(name = "AREAID", nullable = false)
+    private String areaId;
+    
+    @Column(name = "STOREDYNAMICINFOID", nullable = false)
+    private int storeDynamicInfoId = -1;
+    
     public Store(int id, String name, String address, String tel)
     {
         this.id = id;
@@ -72,6 +84,46 @@ public class Store
     public void setTel(String tel) 
     {
         this.tel = tel;
+    }
+    
+    public String getProvinceId()
+    {
+        return provinceId;
+    }
+    
+    public void setProvinceId(String provinceId)
+    {
+        this.provinceId = provinceId;
+    }
+    
+    public String getCityId()
+    {
+        return cityId;
+    }
+    
+    public void setCityId(String cityId)
+    {
+        this.cityId = cityId;
+    }
+    
+    public String getAreaId()
+    {
+        return areaId;
+    }
+    
+    public void setAreaId(String areaId)
+    {
+        this.areaId = areaId;
+    }
+    
+    public int getStoreDynamicInfoId()
+    {
+        return storeDynamicInfoId;
+    }
+    
+    public void setStoreDynamicInfoId(int storeDynamicInfoId)
+    {
+        this.storeDynamicInfoId = storeDynamicInfoId;
     }
 
     @Override

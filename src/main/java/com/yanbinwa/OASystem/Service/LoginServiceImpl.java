@@ -14,6 +14,7 @@ import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
 import com.yanbinwa.OASystem.Model.Store;
+import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.AuthType;
 import com.yanbinwa.OASystem.Model.User.UserState;
@@ -184,7 +185,15 @@ public class LoginServiceImpl implements LoginService
             return false;
         }
         store.setId(getStoreId());
-        return false;
+        user.setUserId(store.getId());
+        UserDynamicInfo userDynamicInfo = createUserDynamicInfo(user);
+        userService.saveUser(user);
+        userService.saveUserDynamicInfo(userDynamicInfo);
+        
+        StoreDynamicInfo storeDynamicInfo = createStoreDynamicInfo(store);
+        storeService.saveStore(store);
+        storeService.saveStoreDynamicInfo(storeDynamicInfo);
+        return true;
     }
 
     private UserDynamicInfo createUserDynamicInfo(User user)
@@ -205,6 +214,14 @@ public class LoginServiceImpl implements LoginService
         employeeDynamicInfo.setCheckinStatus(CheckinStatus.unCheckin);
         employee.setEmployeeDynamicInfoId(employeeDynamicInfo.getId());
         return employeeDynamicInfo;
+    }
+    
+    private StoreDynamicInfo createStoreDynamicInfo(Store store)
+    {
+        StoreDynamicInfo storeDynamicInfo = new StoreDynamicInfo();
+        storeDynamicInfo.setId(store.getId());
+        store.setStoreDynamicInfoId(storeDynamicInfo.getId());
+        return storeDynamicInfo;
     }
     
     @Override

@@ -340,7 +340,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         }
         if (!isSessionLogin(session))
         {
-            if (message.getUrl().contains("/login/"))
+            if (shouldURLAccessWithoutLogin(message.getUrl()))
             {
                 return true;
             }
@@ -350,6 +350,20 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
             }
         }
         return true;
+    }
+    
+    private boolean shouldURLAccessWithoutLogin(String url)
+    {
+        boolean ret = false;
+        if (url.contains("/login/"))
+        {
+            return true;
+        }
+        else if(url.contains("/location/"))
+        {
+            return true;
+        }
+        return ret;
     }
     
     private Session getSession(WebSocketSession webSocketSession)
