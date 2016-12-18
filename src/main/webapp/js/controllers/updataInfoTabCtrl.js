@@ -1,9 +1,9 @@
 angular.module('ionicApp.controllers')
 
-.controller('UpdataInfoTabCtrl', function($scope, $state, StoreInfo, UserInfo) {
+.controller('UpdataInfoTabCtrl', function($scope, $rootScope, $state, StoreInfo, UserInfo, URL) {
 	
     $scope.$watch('$viewContentLoaded', function(event) {
-    	
+    	openTabResponse();
 	})
 	
 	$scope.$on("GeneralEvent", function(event, msg) {
@@ -12,11 +12,11 @@ angular.module('ionicApp.controllers')
 			onSessionConnectedResponse(msg);
 		}
 	});
-	
+    
 	var onSessionConnectedResponse = function(msg) {
 		var stateAuth = msg.stateAuth;
 		if (!stateAuth) {
-			$state.go('login');
+			$state.go(URL.getLoginStateName());
 		}
 	}
 	

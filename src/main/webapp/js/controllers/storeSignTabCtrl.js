@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('StoreSignTabCtrl', function($scope, $rootScope, $state, User, Store, DateUtil, WebsocketClient) {
+.controller('StoreSignTabCtrl', function($scope, $rootScope, $state, User, Store, DateUtil, WebsocketClient, URL) {
     
 	var scope = $rootScope;
 	
@@ -27,6 +27,20 @@ angular.module('ionicApp.controllers')
 		}
 	});
     
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+    	var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'StoreSignTabCtrl') {
+			openTabResponse();
+		}
+	});
+	
+	$scope.$on("GeneralEvent", function(event, msg) {
+		var functionKey = msg.functionKey;
+		if (functionKey == 'onSessionConnected') {
+			onSessionConnectedResponse(msg);
+		}
+	});
+    
     $scope.confirm = function() {
         if(!vaildateUser($scope.user)) {
         	return;
@@ -45,21 +59,24 @@ angular.module('ionicApp.controllers')
     }
     
     $scope.clear = function() {
-    	updateTab();
+    	updateTab(false);
 	}
     
-    var updateTab = function() {
-    	$scope.user = User.getUserTemplate();
+    var updateTab = function(tag) {
+    	$scope.user = User.getUserTemplate('store');
         $scope.store = Store.getStoreTemplate();
         $scope.provinces = [];
         $scope.citys = [];
         $scope.areas = [];
         $scope.location = {};
-        getProvinceList();
+        if (tag == true)
+        {
+            getProvinceList();
+        }
     }
     
     var openTabResponse = function() {
-    	updateTab();
+    	updateTab(true);
     }
     
     var vaildateUser = function(user) {
@@ -135,8 +152,12 @@ angular.module('ionicApp.controllers')
 			return;
 		}
     	alert("您的申请已经成功提交，请等待审核");
-    	updateTab();
-    	$state.go('login');
+    	updateTab(false);
+    	$state.go(URL.getSignStateName());
+    }
+    
+    var onSessionConnectedResponse = function(msg) {
+    	openTabResponse();
     }
     
     /*  Location query  */
@@ -253,7 +274,5 @@ angular.module('ionicApp.controllers')
     	$scope.location.area = {};
     	scope.$digest();
     }
-    
-    updateTab();
     
 });

@@ -6,6 +6,7 @@ create table store (
    provinceId   VARCHAR(30) NOT NULL,
    cityId   VARCHAR(30) NOT NULL,
    areaId   VARCHAR(30) NOT NULL,
+   location   VARCHAR(100) NOT NULL,
    storeDynamicInfoId INT,
    PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

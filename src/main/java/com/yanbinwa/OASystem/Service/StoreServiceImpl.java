@@ -25,6 +25,9 @@ public class StoreServiceImpl implements StoreService
     
     @Autowired
     private StoreDynamicInfoDao storeDynamicInfoDao;
+    
+    @Autowired
+    private LocationService locationService;
 
     @Override
     public Store findById(int id)
@@ -112,6 +115,29 @@ public class StoreServiceImpl implements StoreService
         }
         store.setAreaId(areaId);
         
+        String location = "";
+        String provinceName = locationService.getProvinceById(provinceId);
+        if (provinceName == null)
+        {
+            logger.error("Can not found province by id: " + provinceId);
+            return null;
+        }
+        location += provinceName;
+        String cityName = locationService.getCityById(cityId);
+        if (cityName == null)
+        {
+            logger.error("Can not found city by id: " + cityId);
+            return null;
+        }
+        location += cityName;
+        String areaName = locationService.getAreaById(areaId);
+        if (areaName == null)
+        {
+            logger.error("Can not found city by id: " + areaId);
+            return null;
+        }
+        location += areaName;
+        store.setLocation(location);
         return store;
     }
 

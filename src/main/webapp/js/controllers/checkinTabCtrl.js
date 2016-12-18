@@ -1,9 +1,9 @@
 angular.module('ionicApp.controllers')
 
-.controller('CheckinTabCtrl', function($scope, $state, WebsocketClient, UserInfo, StoreInfo) {
+.controller('CheckinTabCtrl', function($scope, $rootScope, $state, WebsocketClient, UserInfo, StoreInfo, URL) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
-
+		getORCodeKey();
 	})
 	
 	$scope.$on("GeneralEvent", function(event, msg) {
@@ -13,10 +13,17 @@ angular.module('ionicApp.controllers')
 		}
 	});
 	
+	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+		var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'CheckinTabCtrl') {
+			openTabResponse();
+		}
+	})
+	
 	var onSessionConnectedResponse = function(msg) {
 		var stateAuth = msg.stateAuth;
 		if (!stateAuth) {
-			$state.go('login');
+			$state.go(URL.getLoginStateName());
 		}
 	}
 	
@@ -81,7 +88,5 @@ angular.module('ionicApp.controllers')
 		msg.routeKey = 'CheckinTabCtrl';
 		$scope.$emit("MainCtrl", msg);
 	}
-	
-	getORCodeKey();
 	
 });

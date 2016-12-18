@@ -30,6 +30,9 @@ public class Store
     @Column(name = "AREAID", nullable = false)
     private String areaId;
     
+    @Column(name = "LOCATION", nullable = false)
+    private String location;
+    
     @Column(name = "STOREDYNAMICINFOID", nullable = false)
     private int storeDynamicInfoId = -1;
     
@@ -114,6 +117,16 @@ public class Store
     public void setAreaId(String areaId)
     {
         this.areaId = areaId;
+    }
+    
+    public String getLocation()
+    {
+        return location;
+    }
+    
+    public void setLocation(String location)
+    {
+        this.location = location;
     }
     
     public int getStoreDynamicInfoId()

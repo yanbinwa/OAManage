@@ -9,4 +9,8 @@ public interface LocationService
     String getProvinceList();
     String getCityList(String id);
     String getAreaList(String id);
+    
+    String getProvinceById(String id);
+    String getCityById(String id);
+    String getAreaById(String id);
 }

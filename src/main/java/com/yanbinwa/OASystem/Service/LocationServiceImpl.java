@@ -181,4 +181,25 @@ public class LocationServiceImpl implements LocationService
         JSONObject retJsonObject = JSONObject.fromObject(retAreaMap);
         return retJsonObject.toString();
     }
+
+    @Override
+    public String getProvinceById(String id)
+    {
+        // TODO Auto-generated method stub
+        return provinceInfoMap.get(id);
+    }
+
+    @Override
+    public String getCityById(String id)
+    {
+        // TODO Auto-generated method stub
+        return cityInfoMap.get(id);
+    }
+
+    @Override
+    public String getAreaById(String id)
+    {
+        // TODO Auto-generated method stub
+        return areaInfoMap.get(id);
+    }
 }

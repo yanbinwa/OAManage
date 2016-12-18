@@ -188,12 +188,20 @@ angular.module('ionicApp.services', [])
 .factory('User', function() {
 	var userTemplate = {
 		authType: '普通用户',
-		userType: 'store'
+		userType: 'employee'
 	};
 	
 	return {
-		getUserTemplate: function() {
+		getUserTemplate: function(userType) {
 			var newUser = JSON.parse(JSON.stringify(userTemplate));
+			if (userType == 'employee')
+			{
+				newUser.userType = 'employee';
+			}
+			else if (userType == 'store')
+			{
+				newUser.userType = 'store';
+			}
 			return newUser;
 		},
 		clearUser: function(user) {
@@ -244,29 +252,25 @@ angular.module('ionicApp.services', [])
 			if (notification.type != "UserSignVerify") {
 				return false;
 			}
-			if (notification.userObject == null) {
+			if (notification.user == null) {
 				return false;
 			}
-			if (notification.userObject.sex == null) {
+			if (notification.user.userType != 'Employee') {
 				return false;
 			}
-			else {
-				return true;
-			}
+			return true;
 		},
 		isStoreSignNotify: function(notification) {
 			if (notification.type != "UserSignVerify") {
 				return false;
 			}
-			if (notification.userObject == null) {
+			if (notification.user == null) {
 				return false;
 			}
-			if (notification.userObject.sex == null) {
-				return true;
-			}
-			else {
+			if (notification.user.userType != 'Store') {
 				return false;
 			}
+			return true;
 		}
 	}
 })
@@ -336,4 +340,68 @@ angular.module('ionicApp.services', [])
 		}
 	}
 
+})
+
+//通过url拿到对应的controller，也就是routingkey，这里注意login界面的重定向
+.factory('URL', function() {
+	var addEmployeeTabCtrUrl = '/addEmployee';
+	var addEmployeeTabCtr = 'AddEmployeeTabCtrl';
+	var checkinTabCtrlUrl = '/checkin';
+	var checkinTabCtrl = 'CheckinTabCtrl';
+	var signCtrUrl = '/storeSign';
+	var signCtr = 'StoreSignTabCtrl';
+	var signStateName = 'storeSign';
+//	var signCtrUrl = '/employeeSign';
+//	var signCtr = 'EmployeeSignTabCtrl';
+//	var signStateName = 'employeeSign';
+	
+	var loginCtrUrl = '/employeeLogin';
+	var loginCtr = 'EmployeeLoginTabCtrl';
+	var loginStateName = 'employeeLogin';
+	var homeTabCtrUrl = '/home';
+	var homeTabCtr = 'HomeTabCtrl';
+	var updateInfoTabCtrUrl = '/updateInfo';
+	var updateInfoTabCtr = 'UpdateInfoTabCtrl';
+	var userTabCtrlUrl = '/userEmployee';
+	var userTabCtrl = 'UserEmployeeTabCtrl';
+	var userStateName = 'app.main.userEmployee';
+	
+	return {
+		getCtrByUrl : function(url) {
+			var controller = loginCtr;
+			switch(url) {
+			case addEmployeeTabCtrUrl:
+				controller = addEmployeeTabCtr;
+				break;
+			case checkinTabCtrlUrl:
+				controller = checkinTabCtrl;
+				break;
+			case signCtrUrl:
+				controller = signCtr;
+				break;
+			case loginCtrUrl:
+				controller = loginCtr;
+				break;
+			case homeTabCtrUrl:
+				controller = homeTabCtr;
+				break;
+			case updateInfoTabCtrUrl:
+				controller = updateInfoTabCtr;
+				break;
+			case userTabCtrlUrl:
+				controller = userTabCtrl;
+				break;
+			}
+			return controller;
+		},
+		getLoginStateName : function() {
+			return loginStateName;
+		},
+		getSignStateName : function() {
+			return signStateName;
+		},
+		getUserStateName : function() {
+			return userStateName;
+		}
+	}	
 });

@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('EmployeeLoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient, UserInfo) {
+.controller('EmployeeLoginTabCtrl', function($scope, $rootScope, $state, DateUtil, WebsocketClient, UserInfo, URL) {
     
 	$scope.$on("EmployeeLoginTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
@@ -13,13 +13,14 @@ angular.module('ionicApp.controllers')
 		else if(functionKey == 'getEmployeeInfo') {
 			getEmployeeInfoResponse(msg);
 		}
-		else if(functionKey == 'getStoreInfo') {
-			getStoreInfoResponse(msg);
-		}
 	});
 	
-	$scope.user = {};
-    $scope.user.auth = "普通用户";
+	$scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+		var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'EmployeeLoginTabCtrl') {
+			openTabResponse();
+		}
+	})
     
     $scope.login = function() {
         alert("name is " + $scope.user.username + ", password is: " + $scope.user.password + ", role is: " + $scope.user.auth);
@@ -32,7 +33,7 @@ angular.module('ionicApp.controllers')
         
     }
     $scope.sign = function() {
-        $state.go('sign');
+        $state.go(URL.getSignStateName());
     }
     
     var sendMsg = function(msg) {
@@ -86,28 +87,6 @@ angular.module('ionicApp.controllers')
     	var employee = msg.responsePayLoad;
     	UserInfo.setUserInfoEmployee(employee);
     	UserInfo.saveUserInfo(WebsocketClient.getStorageKey());
-    	alert("登陆成功");
-    	$state.go('app.main.home');
-    }
-    
-    var getStoreInfo = function(id) {
-    	var data = {
-			functionKey: 'getStoreInfo',
-			urlName: 'GetStoreById',
-			payLoad: null,
-			urlParameter: id
-		}
-    	sendMsg(data);
-    }
-    
-    var getStoreInfoResponse = function(msg) {
-    	var responseCode = msg.responseCode;
-    	if (responseCode != WebsocketClient.getResponseOk()) {
-			alert(msg.responsePayLoad);
-			return;
-		}
-    	var store = msg.responsePayLoad;
-    	UserInfo.setUserInfoStore(store);
     	alert("登陆成功");
     	$state.go('app.main.home');
     }

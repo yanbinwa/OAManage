@@ -79,22 +79,22 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
         }
       }
     })
-    .state('login', {
-      url: "/login",
+    .state('employeeLogin', {
+      url: "/employeeLogin",
       templateUrl: "templates/employeeLogin.html",	
       controller: 'EmployeeLoginTabCtrl'
     })
-//    .state('sign', {
-//      url: "/sign",
-//      templateUrl: "templates/employeeSign.html",	
-//      controller: 'EmployeeSignTabCtrl'
-//    })
-    .state('sign', {
-      url: "/sign",
+    .state('employeeSign', {
+      url: "/employeeSign",
+      templateUrl: "templates/employeeSign.html",	
+      controller: 'EmployeeSignTabCtrl'
+    })
+    .state('storeSign', {
+      url: "/storeSign",
       templateUrl: "templates/storeSign.html",	
       controller: 'StoreSignTabCtrl'
     });
   
-  $urlRouterProvider.otherwise("/login");
+  $urlRouterProvider.otherwise("/employeeLogin");
   
 });

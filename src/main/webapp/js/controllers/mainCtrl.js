@@ -5,10 +5,6 @@ angular.module('ionicApp.controllers')
     $scope.$watch('$viewContentLoaded', function(event) {
 
 	})
-			
-	$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-		alert("signOpen");
-	})
 	
 	$scope.infoNum = Notification.getNotificationsSize();
 	$scope.session = WebsocketClient.getSession(onOpen, onClose, onMessage);
@@ -46,30 +42,6 @@ angular.module('ionicApp.controllers')
 			
 		}
 	})
-	
-	$scope.openChildrenTab = function(index) {
-		var responseMsg = {
-			routeKey : null,
-			functionKey : 'openTab'
-		};
-				
-		if (index == 1) {
-			responseMsg.routeKey = 'CheckinTabCtrl';
-		} 
-		else if(index == 2) {
-			responseMsg.routeKey = 'AddEmployeeTabCtrl';
-		}
-		else if(index == 3) {
-			responseMsg.routeKey = 'ListEmployeeTabCtrl';
-		}
-		else if(index == 4) {
-			responseMsg.routeKey = 'UpdataInfoTabCtrl';
-		}
-		else if(index == 5) {
-			
-		}
-		$scope.$broadcast(responseMsg.routeKey, responseMsg);
-	}
 	
   	var sendMsg = function(msg) {
   		msg.routeKey = 'MainCtrl';
@@ -199,6 +171,7 @@ angular.module('ionicApp.controllers')
 
 	$scope.checkBoxContext = {};
 	$scope.checkBoxContext.isSelected = false;
+	$scope.currentNotification = null;
 	
   	var getNotifyMessageResponse = function(msg) {
   		var responseCode = msg.responseCode;
@@ -215,6 +188,7 @@ angular.module('ionicApp.controllers')
   		var notification = payLoad;
   		Notification.addNotification(payLoad);
   		$scope.infoNum = Notification.getNotificationsSize();
+  		$rootScope.$digest();
   	}
   	
   	var getSelectedNotify = function() {
@@ -262,7 +236,6 @@ angular.module('ionicApp.controllers')
   			return "员工申请认证";
   		}
   		else if(Notification.isStoreSignNotify(notification)) {
-  			$scope.storeSignVerifyModal.show();
   			return "门店申请认证";
   		}
   	}
@@ -294,7 +267,7 @@ angular.module('ionicApp.controllers')
   		var notifications = [];
   		notifications.push(notification);
   		handleVerifyNotify(notifications);
-  		removeNotification(notification);
+  		$scope.currentNotification = notification;
   	}
   	
   	var openVerifyNotify = function(notification) {
@@ -318,6 +291,7 @@ angular.module('ionicApp.controllers')
   	var removeNotification = function(notification) {
   		Notification.removeNotification(notification);
   		$scope.infoNum = Notification.getNotificationsSize();
+  		$rootScope.$digest();
   	}
   	
   	var handleVerifyNotify = function(notifications) {
@@ -341,6 +315,11 @@ angular.module('ionicApp.controllers')
   		}
   		else {
   			alert("认证用户时出现成功");
+  			if ($scope.currentNotification != null) {
+  				removeNotification($scope.currentNotification);
+  				closeVerifyNotify($scope.currentNotification);
+  				$scope.currentNotification = null;
+  			}
   		}
   	}
   	

@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('StoreLoginTabCtrl', function($scope, $state, DateUtil, WebsocketClient, UserInfo) {
+.controller('StoreLoginTabCtrl', function($scope, $rootScope, $state, DateUtil, WebsocketClient, UserInfo, URL) {
     
 	$scope.$on("StoreLoginTabCtrl", function(event, msg) {
 		var functionKey = msg.functionKey;
@@ -15,8 +15,12 @@ angular.module('ionicApp.controllers')
 		}
 	});
 	
-	$scope.user = {};
-    $scope.user.auth = "普通用户";
+	$scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+		var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'StoreLoginTabCtrl') {
+			openTabResponse();
+		}
+	})
     
     $scope.login = function() {
         alert("name is " + $scope.user.username + ", password is: " + $scope.user.password + ", role is: " + $scope.user.auth);
@@ -29,7 +33,7 @@ angular.module('ionicApp.controllers')
     }
     
     $scope.sign = function() {
-        $state.go('sign');
+        $state.go(URL.getSignStateName());
     }
     
     var sendMsg = function(msg) {

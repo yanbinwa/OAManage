@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('EmployeeSignTabCtrl', function($scope, $state, User, Employee, DateUtil, WebsocketClient) {
+.controller('EmployeeSignTabCtrl', function($scope, $rootScope, $state, User, Employee, DateUtil, WebsocketClient, URL) {
     
     $scope.$watch('$viewContentLoaded', function(event) {
 		
@@ -15,6 +15,13 @@ angular.module('ionicApp.controllers')
 			userSignResponse(msg);
 		}
 	});
+    
+    $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+    	var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'EmployeeSignTabCtrl') {
+			openTabResponse();
+		}
+	})
     
     $scope.confirm = function() {
         if(!vaildateUser($scope.user)) {
@@ -38,7 +45,7 @@ angular.module('ionicApp.controllers')
 	}
     
     var updateTab = function() {
-    	$scope.user = User.getUserTemplate();
+    	$scope.user = User.getUserTemplate('employee');
         $scope.employee = Employee.getEmployeeTemplate();
         $scope.storeLocate = {
         	provience: '上海',
@@ -143,14 +150,12 @@ angular.module('ionicApp.controllers')
 		}
     	alert("您的申请已经成功提交，请等待审核");
     	updateTab();
-    	$state.go('login');
+    	$state.go(URL.getLoginStateName());
     }
     
     $('#sign_birthday_input').datepicker({
         'format': 'yyyy/m/d',
         'autoclose': true
     });
-    
-    updateTab();
     
 });

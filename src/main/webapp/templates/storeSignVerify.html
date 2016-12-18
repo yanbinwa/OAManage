@@ -20,24 +20,20 @@
         </div>    
         <div class="list list-inset">    
             <div class="item item-input">
-                <span class="input-label">员工姓名</span>
+                <span class="input-label">门店名称</span>
                 <input type="text" ng-model="notification.userObject.name">
-                <span class="input-label">性别</span>    
-                <input type="text" ng-model="notification.userObject.sex">
-            </div>
-              
-            <div class="item item-input">
-                <span class="input-label">出生日期</span>
-                <input type="text" ng-model="notification.userObject.brithday">
-                <span class="input-label">年龄</span>
-                <input type="text" ng-model="notification.userObject.age">
-            </div>
-              
-            <div class="item item-input">
-                <span class="input-label">联系电话</span>
+                <span class="input-label">联系电话</span>    
                 <input type="text" ng-model="notification.userObject.tel">
-                <span class="input-label">省份证号</span>
-                <input type="text" ng-model="notification.userObject.identityId">
+            </div>
+              
+            <div class="item item-input">
+                <span class="input-label">地址</span>
+                <input type="text" ng-model="notification.userObject.location">
+            </div>
+              
+            <div class="item item-input">
+                <span class="input-label">详细地址</span>
+                <input type="text" ng-model="notification.userObject.address">
             </div>
         </div>
         <button class="button button-block button-calm" ng-click="confirmVerifyNotify(notification)">确认</button>

@@ -1,9 +1,9 @@
 angular.module('ionicApp.controllers')
 
-.controller('AddEmployeeTabCtrl', function($scope, $state, WebsocketClient, Employee, UserInfo) {
+.controller('AddEmployeeTabCtrl', function($scope, $rootScope, $state, WebsocketClient, Employee, UserInfo, URL) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
-
+		updateTab();
 	})
 	
 	$scope.$on("GeneralEvent", function(event, msg) {
@@ -13,10 +13,17 @@ angular.module('ionicApp.controllers')
 		}
 	});
 	
+	$rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+		var url = toState.url;
+		if (URL.getCtrByUrl(url) == 'AddEmployeeTabCtrl') {
+			openTabResponse();
+		}
+	})
+	
 	var onSessionConnectedResponse = function(msg) {
 		var stateAuth = msg.stateAuth;
 		if (!stateAuth) {
-			$state.go('login');
+			$state.go(URL.getLoginStateName());
 		}
 	}
 	
@@ -94,6 +101,5 @@ angular.module('ionicApp.controllers')
 		$scope.employeeTemplete = Employee.getEmployeeTemplate();
 		$scope.employee = Employee.getEmptyEmployee();
 	}
-	
-	updateTab();
+
 });
