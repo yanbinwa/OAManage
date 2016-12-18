@@ -1,6 +1,7 @@
 package com.yanbinwa.OASystem.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
@@ -26,4 +27,17 @@ public interface StoreService
     Store vailadeAndGetStoreFromPayLoad(Object storeObj);
     
     void saveStoreDynamicInfo(StoreDynamicInfo storeDynamicInfo);
+    
+    void signStoreById(int id);
+    
+    String getStoreProvince();
+    
+    String getStoreCityByProvinceId(String provinceId);
+    
+    String getStoreAreaByCityId(String cityId);
+    
+    String getStoreByAreaId(String areaId);
+    
+    void loadStoreToLoactionMap(Set<Integer> storeIdSet);
+    
 }

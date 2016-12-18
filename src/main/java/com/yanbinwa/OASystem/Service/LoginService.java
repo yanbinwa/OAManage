@@ -31,4 +31,10 @@ public interface LoginService
     public String changePassword(JSONObject payLoad);
     public String userLogout(JSONObject payLoad);
     public String verifyUserSign(List<JSONObject> payLoad);
+    
+
+    String getStoreProvince();
+    String getStoreCityByProvinceId(String provinceId);
+    String getStoreAreaByCityId(String cityId);
+    String getStoreByAreaId(String areaId);
 }

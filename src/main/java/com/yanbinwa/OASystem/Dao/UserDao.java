@@ -12,5 +12,7 @@ public interface UserDao
     
     List<User> findNoneAuthorizationUser();
     
+    List<User> findStoreUser();
+    
     User findById(int id);
 }

@@ -1,6 +1,8 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import com.yanbinwa.OASystem.Dao.UserDao;
 import com.yanbinwa.OASystem.Dao.UserDynamicInfoDao;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.UserState;
+import com.yanbinwa.OASystem.Model.User.UserType;
 import com.yanbinwa.OASystem.Model.UserDynamicInfo;
 import com.yanbinwa.OASystem.Model.UserDynamicInfo.LoginStatus;
 
@@ -23,7 +26,10 @@ public class UserServiceImpl implements UserService
     
     @Autowired
     private UserDynamicInfoDao userDynamicInfoDao;
-
+    
+    @Autowired
+    private StoreService storeService;
+    
     @Override
     public User findByName(String name)
     {
@@ -70,6 +76,10 @@ public class UserServiceImpl implements UserService
         {
             User user = userDao.findById(userTmp.getId());
             user.setUserState(UserState.Authorization);
+            if (user.getUserType() == UserType.Store) 
+            {
+                storeService.signStoreById(user.getUserId());
+            }
         }
         return "";
     }
@@ -113,6 +123,23 @@ public class UserServiceImpl implements UserService
         {
             return "login out error";
         }
+    }
+
+    @Override
+    public void loadUserToLoactionMap()
+    {
+        // TODO Auto-generated method stub
+        List<User> userList = userDao.findStoreUser();
+        Set<Integer> storeIdSet = new HashSet<Integer>();
+        for (User user : userList)
+        {
+            if (user.getUserState() == UserState.NoneAuthorization)
+            {
+                continue;
+            }
+            storeIdSet.add(user.getUserId());
+        }
+        storeService.loadStoreToLoactionMap(storeIdSet);
     }
 
 }

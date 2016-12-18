@@ -44,6 +44,19 @@ public class Store
         this.tel = tel;
     }
     
+    public Store(String name, String address, String tel, String provinceId, String cityId, String areaId)
+    {
+        this.id = -1;
+        this.name = name;
+        this.address = address;
+        this.tel = tel;
+        this.provinceId = provinceId;
+        this.cityId = cityId;
+        this.areaId = areaId;
+        this.location = null;
+        this.storeDynamicInfoId = -1;
+    }
+    
     public Store()
     {
         

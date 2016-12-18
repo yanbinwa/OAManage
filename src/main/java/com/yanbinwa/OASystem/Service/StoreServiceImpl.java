@@ -1,6 +1,10 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +32,12 @@ public class StoreServiceImpl implements StoreService
     
     @Autowired
     private LocationService locationService;
-
+    
+    private Map<String, Set<String>> provinceIdToCityIdMap = new HashMap<String, Set<String>>();
+    private Map<String, Set<String>> cityIdToAreaIdMap = new HashMap<String, Set<String>>();
+    private Map<String, Set<Integer>> areaIdToStoreIdMap = new HashMap<String, Set<Integer>>();
+    private Map<Integer, String> storeIdToStoreNameMap = new HashMap<Integer, String>();
+    
     @Override
     public Store findById(int id)
     {
@@ -146,6 +155,162 @@ public class StoreServiceImpl implements StoreService
     {
         // TODO Auto-generated method stub
         storeDynamicInfoDao.saveStoreDynamicInfo(storeDynamicInfo);
+    }
+
+    @Override
+    public void signStoreById(int id)
+    {
+        // TODO Auto-generated method stub
+        Store store = storeDao.findById(id);
+        if (store == null)
+        {
+            return;
+        }
+        addStoreToLoactionMap(store);
+    }
+    
+    private void addStoreToLoactionMap(Store store)
+    {
+        String provinceId = store.getProvinceId();
+        String cityId = store.getCityId();
+        String areaId = store.getAreaId();
+        if (provinceId == null || cityId == null || areaId == null)
+        {
+            return;
+        }
+        
+        Set<String> cityIdSet = provinceIdToCityIdMap.get(provinceId);
+        if (cityIdSet == null)
+        {
+            cityIdSet = new HashSet<String>();
+            provinceIdToCityIdMap.put(provinceId, cityIdSet);
+        }
+        cityIdSet.add(cityId);    
+        
+        Set<String> areaIdSet = cityIdToAreaIdMap.get(cityId);
+        if (areaIdSet == null)
+        {
+            areaIdSet = new HashSet<String>();
+            cityIdToAreaIdMap.put(cityId, areaIdSet);
+        }
+        areaIdSet.add(areaId);
+        
+        Set<Integer> storeIdSet = areaIdToStoreIdMap.get(areaId);
+        if (storeIdSet == null)
+        {
+            storeIdSet = new HashSet<Integer>();
+            areaIdToStoreIdMap.put(areaId, storeIdSet);
+        }
+        storeIdSet.add(store.getId());
+        
+        storeIdToStoreNameMap.put(store.getId(), store.getName());
+    }
+
+    @Override
+    public String getStoreProvince()
+    {
+        // TODO Auto-generated method stub
+        Map<String, String> retProvinceMap = new HashMap<String, String>();
+        Set<String> provinceIdList = provinceIdToCityIdMap.keySet();
+        for (String provinceId : provinceIdList)
+        {
+            String provinceName = locationService.getProvinceById(provinceId);
+            if (provinceName == null)
+            {
+                continue;
+            }
+            retProvinceMap.put(provinceId, provinceName);
+        }
+        return JSONObject.fromObject(retProvinceMap).toString();
+    }
+
+    @Override
+    public String getStoreCityByProvinceId(String provinceId)
+    {
+        // TODO Auto-generated method stub
+        Map<String, String> retCityMap = new HashMap<String, String>();
+        Set<String> cityIdList = provinceIdToCityIdMap.get(provinceId);
+        if (cityIdList == null)
+        {
+            return JSONObject.fromObject(retCityMap).toString();
+        }
+        for(String cityId : cityIdList)
+        {
+            String cityName = locationService.getCityById(cityId);
+            if (cityName == null)
+            {
+                continue;
+            }
+            retCityMap.put(cityId, cityName);
+        }
+        return JSONObject.fromObject(retCityMap).toString();
+    }
+
+    @Override
+    public String getStoreAreaByCityId(String cityId)
+    {
+        // TODO Auto-generated method stub
+        Map<String, String> retAreaMap = new HashMap<String, String>();
+        Set<String> areaIdList = cityIdToAreaIdMap.get(cityId);
+        if (areaIdList == null)
+        {
+            return JSONObject.fromObject(retAreaMap).toString();
+        }
+        for(String areaId : areaIdList)
+        {
+            String areaName = locationService.getAreaById(areaId);
+            if (areaName == null)
+            {
+                continue;
+            }
+            retAreaMap.put(areaId, areaName);
+        }
+        return JSONObject.fromObject(retAreaMap).toString();
+    }
+
+    @Override
+    public String getStoreByAreaId(String areaId)
+    {
+        // TODO Auto-generated method stub
+        Map<String, String> retStoreMap = new HashMap<String, String>();
+        Set<Integer> storeIdList = areaIdToStoreIdMap.get(areaId);
+        if (storeIdList == null)
+        {
+            return JSONObject.fromObject(retStoreMap).toString();
+        }
+        for(Integer storeId : storeIdList)
+        {
+            String storeName = storeIdToStoreNameMap.get(storeId);
+            if (storeName == null)
+            {
+                continue;
+            }
+            retStoreMap.put(String.valueOf(storeId), storeName);
+        }
+        return JSONObject.fromObject(retStoreMap).toString();
+    }
+
+    @Override
+    public void loadStoreToLoactionMap(Set<Integer> storeIdSet)
+    {
+        // TODO Auto-generated method stub
+        if (storeIdSet == null)
+        {
+            return;
+        }
+        List<Store> storeList = storeDao.findAllStores();
+        if (storeList == null)
+        {
+            return;
+        }
+        for (Store store : storeList)
+        {
+            if (!storeIdSet.contains(store.getId()))
+            {
+                continue;
+            }
+            addStoreToLoactionMap(store);
+        }
     }
     
 }

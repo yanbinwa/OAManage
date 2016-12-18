@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.UserState;
+import com.yanbinwa.OASystem.Model.User.UserType;
 
 @Repository("userDao")
 public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao
@@ -44,6 +45,16 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao
     {
         // TODO Auto-generated method stub
         return getByKey(id);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<User> findStoreUser()
+    {
+        // TODO Auto-generated method stub
+        Criteria criteria = createEntityCriteria();
+        criteria.add(Restrictions.eq("userType", UserType.Store));
+        return (List<User>)criteria.list();
     }
   
 }

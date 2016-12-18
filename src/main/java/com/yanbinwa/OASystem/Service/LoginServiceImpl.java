@@ -347,4 +347,32 @@ public class LoginServiceImpl implements LoginService
         return userService.verifyUserSign(userList);
     }
 
+    @Override
+    public String getStoreProvince()
+    {
+        // TODO Auto-generated method stub
+        return storeService.getStoreProvince();
+    }
+
+    @Override
+    public String getStoreCityByProvinceId(String provinceId)
+    {
+        // TODO Auto-generated method stub
+        return storeService.getStoreCityByProvinceId(provinceId);
+    }
+
+    @Override
+    public String getStoreAreaByCityId(String cityId)
+    {
+        // TODO Auto-generated method stub
+        return storeService.getStoreAreaByCityId(cityId);
+    }
+
+    @Override
+    public String getStoreByAreaId(String areaId)
+    {
+        // TODO Auto-generated method stub
+        return storeService.getStoreByAreaId(areaId);
+    }
+
 }

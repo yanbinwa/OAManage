@@ -22,4 +22,6 @@ public interface UserService
     String userLogin(User user);
     
     String userLogout(User user);
+    
+    void loadUserToLoactionMap();
 }

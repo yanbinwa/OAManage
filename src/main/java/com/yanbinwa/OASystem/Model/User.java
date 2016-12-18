@@ -67,6 +67,18 @@ public class User
         this.userDynamicInfoId = -1;
     }
     
+    public User(String name, String password, UserType userType, AuthType authType)
+    {
+        this.id = -1;
+        this.name = name;
+        this.password = password;
+        this.userType = userType;
+        this.authType = authType;
+        this.userState = UserState.NoneAuthorization;
+        this.userId = -1;
+        this.userDynamicInfoId = -1;
+    }
+    
     public void setId(int id)
     {
         this.id = id;

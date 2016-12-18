@@ -47,22 +47,25 @@
           <div class="item item-input-inset item-select-inset">
               <span class="input-label">选择门店</span>
               
-              <select ng-model="storeLocate.provience">
-                  <option selected>上海</option>
-                  <option>北京</option>
+              <select ng-model="location.province" ng-change="selectProvince()">
+                  <option ng-repeat="province in provinces" value="{{province}}">{{province.name}}</option>
               </select>
               <span class="input-label padding">省</span>
               
-              <select ng-model="storeLocate.city">
-                  <option selected>上海</option>
-                  <option>北京</option>
+              <select ng-model="location.city" ng-change="selectCity()">
+                  <option ng-repeat="city in citys" value="{{city}}">{{city.name}}</option>
               </select>
               <span class="input-label padding">市</span>
-              <select ng-model="storeLocate.name">
-                  <option selected>徐汇店</option>
-                  <option>松江店</option>
+              
+              <select ng-model="location.area" ng-change="selectArea()">
+                  <option ng-repeat="area in areas" value="{{area}}">{{area.name}}</option>
               </select>
-              <span class="input-label padding">门店</span>
+              <span class="input-label padding">区</span>
+              
+              <select ng-model="location.store" ng-change="selectStore()">
+                  <option ng-repeat="store in stores" value="{{store}}">{{store.name}}</option>
+              </select>
+              <span class="input-label padding">店</span>
           </div>
       </div>
       <button class="button button-block button-calm" ng-click="confirm()">确认</button>

@@ -348,12 +348,12 @@ angular.module('ionicApp.services', [])
 	var addEmployeeTabCtr = 'AddEmployeeTabCtrl';
 	var checkinTabCtrlUrl = '/checkin';
 	var checkinTabCtrl = 'CheckinTabCtrl';
-	var signCtrUrl = '/storeSign';
-	var signCtr = 'StoreSignTabCtrl';
-	var signStateName = 'storeSign';
-//	var signCtrUrl = '/employeeSign';
-//	var signCtr = 'EmployeeSignTabCtrl';
-//	var signStateName = 'employeeSign';
+//	var signCtrUrl = '/storeSign';
+//	var signCtr = 'StoreSignTabCtrl';
+//	var signStateName = 'storeSign';
+	var signCtrUrl = '/employeeSign';
+	var signCtr = 'EmployeeSignTabCtrl';
+	var signStateName = 'employeeSign';
 	
 	var loginCtrUrl = '/employeeLogin';
 	var loginCtr = 'EmployeeLoginTabCtrl';
