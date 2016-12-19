@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('CheckinTabCtrl', function($scope, $rootScope, $state, WebsocketClient, UserInfo, StoreInfo, URL) {
+.controller('CheckinTabCtrl', function($scope, $rootScope, $state, WebsocketClient, UserInfo, URL) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
 		getORCodeKey();
@@ -78,7 +78,12 @@ angular.module('ionicApp.controllers')
 	}
 	
 	var showORCode = function(oRCodeKey) {
-		oRCodeKey = oRCodeKey + "_" + StoreInfo.getStoreInfo().id;
+		var store = UserInfo.getUserInfo().store;
+		if (store == null) {
+			alert("can not get store from UserInfo");
+			return;
+		}
+		oRCodeKey = oRCodeKey + "_" + store.id;
 		$('#code').empty();
 		$('#code').qrcode(oRCodeKey);
 		$scope.$apply();

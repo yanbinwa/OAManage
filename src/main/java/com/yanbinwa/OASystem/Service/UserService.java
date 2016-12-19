@@ -9,6 +9,8 @@ public interface UserService
 {
     User findByName(String name);
     
+    User findById(int id);
+    
     void saveUser(User user);
     
     void saveUserDynamicInfo(UserDynamicInfo userDynamicInfo);

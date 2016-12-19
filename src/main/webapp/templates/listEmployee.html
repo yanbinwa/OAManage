@@ -1,8 +1,10 @@
 <ion-view view-title="查询员工">
   <ion-content class="padding">
     <ion-list>
-      <ion-item ng-repeat="employee in employees">
-        {{employee.name}}
+      <ion-item ng-repeat="employeeBrief in employeeBriefList">
+        <i class="icon ion-chatbubble-working"></i>
+        {{employeeBrief.name}}
+        <i class="icon ion-ios-telephone-outline"></i>
       </ion-item>
     </ion-list>
   </ion-content>

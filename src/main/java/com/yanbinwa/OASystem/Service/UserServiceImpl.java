@@ -142,4 +142,11 @@ public class UserServiceImpl implements UserService
         storeService.loadStoreToLoactionMap(storeIdSet);
     }
 
+    @Override
+    public User findById(int id)
+    {
+        // TODO Auto-generated method stub
+        return userDao.findById(id);
+    }
+
 }

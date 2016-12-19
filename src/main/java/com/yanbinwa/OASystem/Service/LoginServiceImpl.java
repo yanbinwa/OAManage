@@ -160,6 +160,7 @@ public class LoginServiceImpl implements LoginService
         }
         employee.setId(getEmployeeId());
         employee.setStoreId(storeId);
+        employee.setUserId(user.getId());
         
         user.setUserId(employee.getId());
         UserDynamicInfo userDynamicInfo = createUserDynamicInfo(user);
@@ -185,6 +186,8 @@ public class LoginServiceImpl implements LoginService
             return false;
         }
         store.setId(getStoreId());
+        store.setUserId(user.getId());
+        
         user.setUserId(store.getId());
         UserDynamicInfo userDynamicInfo = createUserDynamicInfo(user);
         userService.saveUser(user);

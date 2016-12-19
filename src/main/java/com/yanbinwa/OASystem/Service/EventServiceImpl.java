@@ -104,7 +104,7 @@ public class EventServiceImpl implements EventService
             Set<EventListener> listenerSet = keyToListener.get(target);
             if(listenerSet == null)
             {
-                return;
+                continue;
             }
             for(EventListener listener : listenerSet)
             {

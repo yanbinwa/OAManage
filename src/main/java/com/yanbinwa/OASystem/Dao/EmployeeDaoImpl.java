@@ -3,6 +3,7 @@ package com.yanbinwa.OASystem.Dao;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 import com.yanbinwa.OASystem.Model.Employee;
@@ -39,6 +40,16 @@ public class EmployeeDaoImpl extends AbstractDao<Integer, Employee> implements E
     {
         // TODO Auto-generated method stub
         delete(employee);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Employee> findEmployeesByStoreId(int storeId)
+    {
+        // TODO Auto-generated method stub
+        Criteria criteria = createEntityCriteria();
+        criteria.add(Restrictions.eq("storeId", storeId));
+        return (List<Employee>)criteria.list();
     }
 
 }

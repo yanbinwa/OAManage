@@ -30,4 +30,6 @@ public interface EmployeeService
     String employeeCheckin(Employee employee);
     
     String employeeCheckout(Employee employee);
+    
+    String getEmployeeInfoByStoreId(int storeId);
 }

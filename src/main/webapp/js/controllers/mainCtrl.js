@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, $timeout, $ionicModal, WebsocketClient, StoreInfo, Notification, UserInfo) {
+.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, $timeout, $ionicModal, WebsocketClient, Notification, UserInfo, URL) {
 
     $scope.$watch('$viewContentLoaded', function(event) {
 
@@ -118,11 +118,12 @@ angular.module('ionicApp.controllers')
 		var responseCode = msg.responseCode;
 		var stateAuth = false;
   		if (responseCode != WebsocketClient.getResponseOk()) {
+  			alert("getSessionIdResponse failed");
   			return;
   		}
   		var sessionId = msg.responsePayLoad;
   		if (sessionId == WebsocketClient.getSessionId()) {
-  			StoreInfo.loadStoreInfo(WebsocketClient.getStorageKey());
+  			// this is the refresh operation, need to reload the info from local storage
   			UserInfo.loadUserInfo(WebsocketClient.getStorageKey());
   			stateAuth = true;
   		}
@@ -347,6 +348,10 @@ angular.module('ionicApp.controllers')
   	
   	$scope.isNormalUser = function() {
   		return UserInfo.isNormalUser();
+  	}
+  	
+  	$scope.getUserTabHref = function() {
+  		return URL.getUserTabHref();
   	}
   	
   	/* ---------------------------------------------- */

@@ -1,5 +1,6 @@
 create table employee (
    id INT NOT NULL,
+   userId INT NOT NULL,
    name  VARCHAR(20) NOT NULL,
    sex   VARCHAR(10) NOT NULL,
    birthday   BIGINT  NOT NULL, 

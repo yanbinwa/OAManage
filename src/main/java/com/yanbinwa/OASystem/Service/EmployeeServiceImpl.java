@@ -1,6 +1,8 @@
 package com.yanbinwa.OASystem.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import com.yanbinwa.OASystem.Dao.EmployeeDynamicInfoDao;
 import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
+import com.yanbinwa.OASystem.Model.User;
+import com.yanbinwa.OASystem.Model.User.UserState;
 
 import net.sf.json.JSONObject;
 
@@ -27,6 +31,9 @@ public class EmployeeServiceImpl implements EmployeeService
     
     @Autowired
     private EmployeeDynamicInfoDao employeeDynamicInfoDao;
+    
+    @Autowired
+    private UserService userService;
     
     @Override
     public Employee findById(int id)
@@ -145,6 +152,51 @@ public class EmployeeServiceImpl implements EmployeeService
         {
             return "Error to checkout";
         }
+    }
+
+    @Override
+    public String getEmployeeInfoByStoreId(int storeId)
+    {
+        // TODO Auto-generated method stub
+        Map<String, Map<String, Object>> employeeInfoMap = new HashMap<String, Map<String, Object>>();
+        List<Employee> employees = employeeDao.findEmployeesByStoreId(storeId);
+        if(employees == null)
+        {
+            return JSONObject.fromObject(employeeInfoMap).toString();
+        }
+        for(Employee employee : employees)
+        {
+            int userId = employee.getUserId();
+            User user = userService.findById(userId);
+            if (user == null)
+            {
+                logger.error("getEmployeeInfoByStoreId failed by userId: " + userId);
+                continue;
+            }
+            if (user.getUserState() == UserState.NoneAuthorization)
+            {
+                continue;
+            }
+            int employeeDynamicInfoId = employee.getEmployeeDynamicInfoId();
+            EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employeeDynamicInfoId);
+            if (employeeDynamicInfo == null)
+            {
+                logger.error("getEmployeeInfoByStoreId failed by employeeDynamicInfoId: " + employeeDynamicInfoId);
+                continue;
+            }
+            
+            int employeeId = employee.getId();
+            Map<String, Object> employeeInfo = employeeInfoMap.get(String.valueOf(employeeId));
+            if (employeeInfo == null)
+            {
+                employeeInfo = new HashMap<String, Object>();
+                employeeInfoMap.put(String.valueOf(employeeId), employeeInfo);
+            }
+            employeeInfo.put("employee", employee);
+            employeeInfo.put("employeeDynamicInfo", employeeDynamicInfo);
+        }
+        
+        return JSONObject.fromObject(employeeInfoMap).toString();
     }
 
 }

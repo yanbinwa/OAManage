@@ -2,8 +2,25 @@
   <ion-content class="padding">
       <div class="list list-inset">
           <div class="item">
-              
+              <span class="input-label">用户名称</span>
+              <span class="input-label">{{userInfo.user.name}}</span>
+              <span class="input-label">用户类型</span>
+              <span class="input-label">{{showAuthType(userInfo.user.authType)}}</span>
           </div>
+          <button class="button button-block button-calm" ng-click="changePassword()">修改密码</button>
+          
+          <div class="item">
+              <span class="input-label">门店名称</span>
+              <span class="input-label">{{userInfo.store.name}}</span>
+              <span class="input-label">联系方式</span>
+              <span class="input-label">{{userInfo.store.tel}}</span>
+              <span class="input-label">门店地址</span>
+              <span class="input-label">{{userInfo.store.location}}</span>
+              <span class="input-label">详细地址</span>
+              <span class="input-label">{{userInfo.store.address}}</span>
+          </div>
+          <button class="button button-block button-calm" ng-click="logout()">退出登录</button>
+          
       </div>
   </ion-content>
 </ion-view>

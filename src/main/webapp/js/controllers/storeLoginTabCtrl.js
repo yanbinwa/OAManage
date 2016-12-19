@@ -83,6 +83,7 @@ angular.module('ionicApp.controllers')
 		}
     	var store = msg.responsePayLoad;
     	UserInfo.setUserInfoStore(store);
+    	UserInfo.saveUserInfo(WebsocketClient.getStorageKey());
     	alert("登陆成功");
     	$state.go('app.main.home');
     }

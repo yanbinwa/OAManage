@@ -89,12 +89,17 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
       templateUrl: "templates/employeeSign.html",	
       controller: 'EmployeeSignTabCtrl'
     })
+    .state('storeLogin', {
+      url: "/storeLogin",
+      templateUrl: "templates/storeLogin.html",	
+      controller: 'StoreLoginTabCtrl'
+    })
     .state('storeSign', {
       url: "/storeSign",
       templateUrl: "templates/storeSign.html",	
       controller: 'StoreSignTabCtrl'
     });
   
-  $urlRouterProvider.otherwise("/employeeLogin");
+  $urlRouterProvider.otherwise("/storeLogin");
   
 });

@@ -3,7 +3,7 @@ angular.module('ionicApp.services', [])
 .factory('WebsocketClient', function() {
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
-	var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
+	var SERVER_URL = "wss://10.140.8.37:8443/OAManage/websocket/websocketSpring";
 	//var SERVER_URL = "wss://10.140.8.20:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
@@ -224,6 +224,13 @@ angular.module('ionicApp.services', [])
 			var month = date.getUTCMonth();
 			var day = date.getDate();
 			return year + "/" + month + "/" + day;
+		},
+		getTimeStrFromTimestamp: function(timestamp) {
+			var date = new Date(timestamp);
+			var hour = date.getHours();
+			var minute = date.getMinutes();
+			var second = date.getSeconds();
+			return hour + ":" + minute + ":" + second;
 		}
 	}
 })
@@ -344,52 +351,67 @@ angular.module('ionicApp.services', [])
 
 //通过url拿到对应的controller，也就是routingkey，这里注意login界面的重定向
 .factory('URL', function() {
-	var addEmployeeTabCtrUrl = '/addEmployee';
-	var addEmployeeTabCtr = 'AddEmployeeTabCtrl';
+	var addEmployeeTabCtrlUrl = '/addEmployee';
+	var addEmployeeTabCtrl = 'AddEmployeeTabCtrl';
 	var checkinTabCtrlUrl = '/checkin';
 	var checkinTabCtrl = 'CheckinTabCtrl';
-//	var signCtrUrl = '/storeSign';
-//	var signCtr = 'StoreSignTabCtrl';
-//	var signStateName = 'storeSign';
-	var signCtrUrl = '/employeeSign';
-	var signCtr = 'EmployeeSignTabCtrl';
-	var signStateName = 'employeeSign';
+	var listEmployeeTabCtrlUrl = '/listEmployee';
+	var listEmployeeTabCtrl = 'ListEmployeeTabCtrl';
 	
-	var loginCtrUrl = '/employeeLogin';
-	var loginCtr = 'EmployeeLoginTabCtrl';
-	var loginStateName = 'employeeLogin';
-	var homeTabCtrUrl = '/home';
-	var homeTabCtr = 'HomeTabCtrl';
-	var updateInfoTabCtrUrl = '/updateInfo';
-	var updateInfoTabCtr = 'UpdateInfoTabCtrl';
-	var userTabCtrlUrl = '/userEmployee';
-	var userTabCtrl = 'UserEmployeeTabCtrl';
-	var userStateName = 'app.main.userEmployee';
+	var signCtrlUrl = '/employeeSign';
+	var signCtrl = 'EmployeeSignTabCtrl';
+	var signStateName = 'employeeSign';
+//	var loginCtrlUrl = '/employeeLogin';
+//	var loginCtrl = 'EmployeeLoginTabCtrl';
+//	var loginStateName = 'employeeLogin';
+//	var userTabCtrlUrl = '/userEmployee';
+//	var userTabCtrl = 'UserEmployeeTabCtrl';
+//	var userStateName = 'app.main.userEmployee';
+//	var userStateHref = '#/app/main/userEmployee';
+	
+//	var signCtrlUrl = '/storeSign';
+//	var signCtrl = 'StoreSignTabCtrl';
+//	var signStateName = 'storeSign';
+	var loginCtrlUrl = '/storeLogin';
+	var loginCtrl = 'StoreLoginTabCtrl';
+	var loginStateName = 'storeLogin';
+	var userTabCtrlUrl = '/userStore';
+	var userTabCtrl = 'UserStoreTabCtrl';
+	var userStateName = 'app.main.userStore';
+	var userStateHref = '#/app/main/userStore';
+	
+	var homeTabCtrlUrl = '/home';
+	var homeTabCtrl = 'HomeTabCtrl';
+	var updateInfoTabCtrlUrl = '/updateInfo';
+	var updateInfoTabCtrl = 'UpdateInfoTabCtrl';
 	
 	return {
 		getCtrByUrl : function(url) {
-			var controller = loginCtr;
+			var controller = loginCtrl;
 			switch(url) {
-			case addEmployeeTabCtrUrl:
-				controller = addEmployeeTabCtr;
+			case addEmployeeTabCtrlUrl:
+				controller = addEmployeeTabCtrl;
 				break;
 			case checkinTabCtrlUrl:
 				controller = checkinTabCtrl;
 				break;
-			case signCtrUrl:
-				controller = signCtr;
+			case signCtrlUrl:
+				controller = signCtrl;
 				break;
-			case loginCtrUrl:
-				controller = loginCtr;
+			case loginCtrlUrl:
+				controller = loginCtrl;
 				break;
-			case homeTabCtrUrl:
-				controller = homeTabCtr;
+			case homeTabCtrlUrl:
+				controller = homeTabCtrl;
 				break;
-			case updateInfoTabCtrUrl:
-				controller = updateInfoTabCtr;
+			case updateInfoTabCtrlUrl:
+				controller = updateInfoTabCtrl;
 				break;
 			case userTabCtrlUrl:
 				controller = userTabCtrl;
+				break;
+			case listEmployeeTabCtrlUrl:
+				controller = listEmployeeTabCtrl;
 				break;
 			}
 			return controller;
@@ -402,6 +424,9 @@ angular.module('ionicApp.services', [])
 		},
 		getUserStateName : function() {
 			return userStateName;
+		},
+		getUserTabHref: function() {
+			return userStateHref;
 		}
 	}	
 });

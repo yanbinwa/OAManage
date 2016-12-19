@@ -12,6 +12,9 @@ public class Employee
     @Id
     private int id;
 
+    @Column(name = "USERID", nullable = false)
+    private int userId;
+    
     @Column(name = "NAME", nullable = false)
     private String name;
     
@@ -75,6 +78,16 @@ public class Employee
     public void setId(int id) 
     {
         this.id = id;
+    }
+    
+    public int getUserId() 
+    {
+        return userId;
+    }
+
+    public void setUserId(int userId) 
+    {
+        this.userId = userId;
     }
     
     public String getName() 

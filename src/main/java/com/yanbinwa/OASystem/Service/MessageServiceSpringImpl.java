@@ -766,8 +766,38 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         public void run()
         {
             // TODO Auto-generated method stub
-            // find all session for adminUser or normalUser and send the message
-            
+            // find all session for adminUser and send the message
+            Set<Session> adminStoreSession = sessionTypeToSessionMap.get(SessionType.AdminStoreSession);
+            if (adminStoreSession == null || adminStoreSession.isEmpty())
+            {
+                try
+                {
+                    Thread.sleep(5000);
+                    if (adminStoreSession == null || adminStoreSession.isEmpty())
+                    {
+                        notifiyAdminEmployeeUser(message);
+                        return;
+                    }
+                } 
+                catch (InterruptedException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+            TextMessage returnMessage = new TextMessage(message.getResponseJsonStr());
+            for(Session session : adminStoreSession)
+            {
+                try
+                {
+                    session.getWebSocketSession().sendMessage(returnMessage);
+                } 
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
         
     }

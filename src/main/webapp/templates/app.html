@@ -9,7 +9,7 @@
       
       <ion-nav-buttons side="right">
         <a class="button button-icon icon ion-gear-a" href="#"></a>
-        <a class="button button-icon icon ion-person" href="#/app/main/userEmployee"></a>
+        <a class="button button-icon icon ion-person" href="{{getUserTabHref()}}"></a>
         <button class="button button-icon button-clear ion-paper-airplane" menu-toggle="right">
           <i ng-show="shouldShowInfoNum()">{{infoNum}}</i>
         </button>
@@ -29,7 +29,8 @@
         <!-- Note each link has the 'menu-close' attribute so the menu auto closes when clicking on one of these links -->
         <a href="#/app/main/checkin" class="item" menu-close>打卡</a>
         <a href="#/app/main/addEmployee" class="item" menu-close>添加员工</a>
-        <a href="#/app/main/listEmployee" class="item" menu-close ng-show="isAdminUser()">查询员工</a>
+        <!-- <a href="#/app/main/listEmployee" class="item" menu-close ng-show="isAdminUser()">查询员工</a> -->
+        <a href="#/app/main/listEmployee" class="item" menu-close>查询员工</a>
         <a href="#/app/main/updataInfo" class="item" menu-close>门店信息</a>
       </ul>
     </ion-content>

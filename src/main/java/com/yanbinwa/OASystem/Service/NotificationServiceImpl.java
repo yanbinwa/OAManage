@@ -157,7 +157,7 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         message.setResponseCode(responseCode);
         message.setResponsePayLoad(jsonObj.toString());
         
-        boolean ret = messageServiceSpring.notifiyAdminEmployeeUser(message);
+        boolean ret = messageServiceSpring.notifiyAdminStoreUser(message);
         if (!ret)
         {
             logger.error("Can not notify the message");
