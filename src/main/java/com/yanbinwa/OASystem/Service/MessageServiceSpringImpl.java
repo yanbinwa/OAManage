@@ -775,7 +775,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
                     Thread.sleep(5000);
                     if (adminStoreSession == null || adminStoreSession.isEmpty())
                     {
-                        notifiyAdminEmployeeUser(message);
+                        notifiyAdminStoreUser(message);
                         return;
                     }
                 } 

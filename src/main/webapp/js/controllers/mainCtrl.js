@@ -1,6 +1,6 @@
 angular.module('ionicApp.controllers')
 
-.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, $timeout, $ionicModal, WebsocketClient, Notification, UserInfo, URL) {
+.controller('MainCtrl', function($scope, $state, $rootScope, $ionicSideMenuDelegate, $timeout, $ionicModal, WebsocketClient, Notification, UserInfo, URL, DateUtil) {
 
     $scope.$watch('$viewContentLoaded', function(event) {
 
@@ -326,6 +326,39 @@ angular.module('ionicApp.controllers')
   	
   	/* ---------------------------------------------- */
 
+  	/* --------- User ---------- */
+  	
+  	$scope.showUserType = function(userType) {
+  		if (userType == "Employee") {
+  			return "员工用户";
+  		}
+  		else if(userType == "Store") {
+  			return "门店用户";
+  		}
+  		return null;
+  	}
+  	
+  	$scope.showAuthType = function(authType) {
+		if (authType == "Normal") {
+			return "普通用户";
+		}
+		else if(authType == "Admin") {
+			return "管理员用户";
+		}
+		return null;
+	}
+  	
+  	/* ---------------------------------------------- */
+  	
+  	
+    /* --------- Employee ---------- */
+  	
+  	$scope.showEmployeeBirthday = function(birthday) {
+		return DateUtil.getDateStrFromTimestamp(birthday);
+	}
+  	
+  	/* ---------------------------------------------- */
+  	
   	
   	/* --------- Other ---------- */
   	

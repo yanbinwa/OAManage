@@ -115,10 +115,7 @@ angular.module('ionicApp.controllers')
     		return false;
     	}
     	employee.birthday = DateUtil.getTimestampFromDateStr(birthdayStr);
-    	if(employee.age == null || employee.age == '') {
-    		alert("请输入年龄");
-    		return false;
-    	}
+    	employee.age = getAgeFromBirthdayTimestamp(employee.birthday);
     	if(employee.sex == null || employee.sex == '')
         {
     	    alert("请输入性别");	

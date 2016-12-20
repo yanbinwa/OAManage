@@ -3,7 +3,7 @@ angular.module('ionicApp.controllers')
 .controller('CheckinTabCtrl', function($scope, $rootScope, $state, WebsocketClient, UserInfo, URL) {
 	
 	$scope.$watch('$viewContentLoaded', function(event) {
-		getORCodeKey();
+		openTabResponse();
 	})
 	
 	$scope.$on("GeneralEvent", function(event, msg) {
@@ -25,6 +25,9 @@ angular.module('ionicApp.controllers')
 		if (!stateAuth) {
 			$state.go(URL.getLoginStateName());
 		}
+		else {
+			openTabResponse();
+		}
 	}
 	
 	$scope.$on("CheckinTabCtrl", function(event, msg) {
@@ -34,7 +37,7 @@ angular.module('ionicApp.controllers')
 			getORCodeKeyResponse(msg);
 		}
 		else if(functionKey == 'openTab') {
-			openTabResponse(msg);
+			openTabResponse();
 		}
 		// push the ORCode
 		else if(functionKey == 'oRCodeKeyUpdate') {
@@ -65,7 +68,7 @@ angular.module('ionicApp.controllers')
 		showORCode(msg.responsePayLoad);
 	}
 	
-	var openTabResponse = function(msg) {
+	var openTabResponse = function() {
 		getORCodeKey();
 	}
 	

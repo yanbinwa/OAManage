@@ -4,7 +4,7 @@ angular.module('ionicApp.services', [])
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
 	var SERVER_URL = "wss://10.140.8.37:8443/OAManage/websocket/websocketSpring";
-	//var SERVER_URL = "wss://10.140.8.20:8443/OAManage/websocket/websocketSpring";
+	//var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
 	var INVALIDATE_SESSIONID = -1;
@@ -231,6 +231,11 @@ angular.module('ionicApp.services', [])
 			var minute = date.getMinutes();
 			var second = date.getSeconds();
 			return hour + ":" + minute + ":" + second;
+		},
+		getAgeFromBirthdayTimestamp: function(timestamp) {
+			var currentYear = new Date().getFullYear();
+			var brithdayYear = new Date(timestamp).getFullYear();
+			return currentYear - brithdayYear;
 		}
 	}
 })
