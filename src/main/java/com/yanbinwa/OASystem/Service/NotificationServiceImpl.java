@@ -180,12 +180,12 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         message.setFunctionKey(functionKey);
         message.setResponseCode(responseCode);
         message.setResponsePayLoad(oRCodeKey);
-        boolean ret = messageServiceSpring.notifiyAdminEmployeeUser(message);
+        boolean ret = messageServiceSpring.notifiyAdminStoreUser(message);
         if (!ret)
         {
             logger.error("Can not send the ORCode update message to admin");
         }
-        ret = messageServiceSpring.notifiyNormalEmployeeUser(message);
+        ret = messageServiceSpring.notifiyNormalStoreUser(message);
         if (!ret)
         {
             logger.error("Can not send the ORCode update message to normal");

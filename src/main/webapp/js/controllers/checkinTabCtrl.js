@@ -89,7 +89,7 @@ angular.module('ionicApp.controllers')
 		oRCodeKey = oRCodeKey + "_" + store.id;
 		$('#code').empty();
 		$('#code').qrcode(oRCodeKey);
-		$scope.$apply();
+		$scope.$digest();
 	}
 	
 	var sendMsg = function(msg) {

@@ -14,8 +14,10 @@ import com.yanbinwa.OASystem.Dao.EmployeeDynamicInfoDao;
 import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
+import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.UserState;
+import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 import net.sf.json.JSONObject;
 
@@ -34,6 +36,12 @@ public class EmployeeServiceImpl implements EmployeeService
     
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private StoreService storeService;
+    
+    @Autowired
+    private ORCodeService oRCodeService; 
     
     @Override
     public Employee findById(int id)
@@ -119,41 +127,128 @@ public class EmployeeServiceImpl implements EmployeeService
         // TODO Auto-generated method stub
         employeeDynamicInfoDao.saveEmployeeDynamicInfo(employeeDynamicInfo);
     }
-
+    
     @Override
-    public String employeeCheckin(Employee employee)
+    public JSONObject employeeCheckin(JSONObject payLoad)
     {
         // TODO Auto-generated method stub
-        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
-        if (employeeDynamicInfo != null)
+        JSONObject response = new JSONObject();
+        response.put(RESPONSE_STATE, HttpUtils.RESPONSE_ERROR);
+        if (payLoad == null)
         {
-            employeeDynamicInfo.setCheckinTime(System.currentTimeMillis());
-            employeeDynamicInfo.setCheckinStatus(CheckinStatus.checkin);
-            return "";
+            response.put(RESPONSE_PAYLOAD, "employeeCheckin payLoad is empty");
+            return response;
+        }
+        String barcodeStr = payLoad.getString(BARCODE);
+        if (barcodeStr == null) 
+        {
+            response.put(RESPONSE_PAYLOAD, "employeeCheckin barcode is empty");
+            return response;
+        }
+        String[] barcodeStrList = barcodeStr.split("_");
+        if (barcodeStrList.length != 2)
+        {
+            response.put(RESPONSE_PAYLOAD, "employeeCheckin barcode is invaild");
+            return response;
+        }
+        String oRCodeKey = barcodeStrList[0].trim();
+        
+        if (!oRCodeKey.equals(oRCodeService.getORCodeKey()))
+        {
+            response.put(RESPONSE_PAYLOAD, "barcode key is invaild");
+            return response;
+        }
+        
+        int storeId = Integer.valueOf(barcodeStrList[1]);
+        Store store = storeService.findById(storeId);
+        if (store == null)
+        {
+            response.put(RESPONSE_PAYLOAD, "store is invaild");
+            return response;
+        }
+        
+        int employeeId = payLoad.getInt(EMPLOYEE_ID);
+        Employee employee = employeeDao.findById(employeeId);
+        if (employee == null)
+        {
+            response.put(RESPONSE_PAYLOAD, "employee is not find");
+            return response;
+        }
+        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
+        if (employeeDynamicInfo == null)
+        {
+            response.put(RESPONSE_PAYLOAD, "employee dynamic info is not find");
+            return response;
+        }
+        
+        String action = payLoad.getString(CHECKIN_ACTION);
+        if (action == null)
+        {
+            response.put(RESPONSE_PAYLOAD, "employeeCheckin action is empty");
+            return response;
+        }
+        
+        if (action.trim().equals(CHECKIN_ACTION_CHECKIN))
+        {
+            return checkin(employeeDynamicInfo, store, response);
+        }
+        else if(action.trim().equals(CHECKIN_ACTION_CHECKOUT))
+        {
+            return checkout(employeeDynamicInfo, store, response);
         }
         else
         {
-            return "Error to checkin";
+            response.put(RESPONSE_PAYLOAD, "employeeCheckin action is vaild");
+            return response;
         }
     }
-
-    @Override
-    public String employeeCheckout(Employee employee)
+    
+    private JSONObject checkin(EmployeeDynamicInfo employeeDynamicInfo, Store store, JSONObject response)
     {
-        // TODO Auto-generated method stub
-        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
-        if (employeeDynamicInfo != null)
+        CheckinStatus checkinStatus = employeeDynamicInfo.getCheckinStatus();
+        if (checkinStatus == CheckinStatus.checkin)
         {
-            employeeDynamicInfo.setCheckoutTime(System.currentTimeMillis());
-            employeeDynamicInfo.setCheckinStatus(CheckinStatus.unCheckin);
-            return "";
+            int storeId = employeeDynamicInfo.getCheckinStoreId();
+            String storeName = "";
+            if (storeId == store.getId())
+            {
+                storeName = store.getName();
+            }
+            else if (storeId == -1)
+            {
+                storeName = "";
+            }
+            else
+            {
+                storeName = storeService.findById(storeId).getName();
+            }
+            response.put(RESPONSE_PAYLOAD, "Has already checkin at " + storeName);
+            return response;
         }
-        else
-        {
-            return "Error to checkout";
-        }
+        employeeDynamicInfo.setCheckinTime(System.currentTimeMillis());
+        employeeDynamicInfo.setCheckinStatus(CheckinStatus.checkin);
+        employeeDynamicInfo.setCheckinStoreId(store.getId());
+        response.put(RESPONSE_STATE, HttpUtils.RESPONSE_OK);
+        response.put(RESPONSE_PAYLOAD, store.getName());
+        return response;
     }
-
+    
+    private JSONObject checkout(EmployeeDynamicInfo employeeDynamicInfo, Store store, JSONObject response)
+    {
+        CheckinStatus checkinStatus = employeeDynamicInfo.getCheckinStatus();
+        if (checkinStatus == CheckinStatus.unCheckin)
+        {
+            response.put(RESPONSE_PAYLOAD, "Not checkin yet");
+            return response;
+        }
+        employeeDynamicInfo.setCheckoutTime(System.currentTimeMillis());
+        employeeDynamicInfo.setCheckinStatus(CheckinStatus.unCheckin);
+        employeeDynamicInfo.setCheckinStoreId(-1);
+        response.put(RESPONSE_STATE, HttpUtils.RESPONSE_OK);
+        response.put(RESPONSE_PAYLOAD, store.getName());
+        return response;
+    }
+    
     @Override
     public String getEmployeeInfoByStoreId(int storeId)
     {

@@ -84,10 +84,15 @@ angular.module('ionicApp', ['ionic', 'ionicApp.controllers', 'ionicApp.services'
       templateUrl: "templates/employeeLogin.html",	
       controller: 'EmployeeLoginTabCtrl'
     })
+//    .state('employeeSign', {
+//      url: "/employeeSign",
+//      templateUrl: "templates/employeeSign.html",	
+//      controller: 'EmployeeSignTabCtrl'
+//    })
     .state('employeeSign', {
       url: "/employeeSign",
-      templateUrl: "templates/employeeSign.html",	
-      controller: 'EmployeeSignTabCtrl'
+      templateUrl: "templates/employeeSignMobile.html",	
+      controller: 'EmployeeSignMobileTabCtrl'
     })
     .state('storeLogin', {
       url: "/storeLogin",

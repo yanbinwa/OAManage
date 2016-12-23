@@ -5,6 +5,8 @@ import java.util.List;
 import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 
+import net.sf.json.JSONObject;
+
 public interface EmployeeService
 {
     public static final String EMPLOYEE_ID = "id";
@@ -14,6 +16,13 @@ public interface EmployeeService
     public static final String EMPLOYEE_BIRTHDAY = "birthday";
     public static final String EMPLOYEE_TEL = "tel";
     public static final String EMPLOYEE_IDENTITY_ID = "ID";
+
+    public static final String BARCODE = "barcode";
+    public static final String CHECKIN_ACTION = "checkinAction";
+    public static final String CHECKIN_ACTION_CHECKIN = "checkin";
+    public static final String CHECKIN_ACTION_CHECKOUT = "checkout";
+    public static final String RESPONSE_STATE = "responseState";
+    public static final String RESPONSE_PAYLOAD = "responsePayload";
     
     Employee findById(int id);
     
@@ -27,9 +36,7 @@ public interface EmployeeService
     
     void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo);
     
-    String employeeCheckin(Employee employee);
-    
-    String employeeCheckout(Employee employee);
-    
+    JSONObject employeeCheckin(JSONObject payLoad);
+            
     String getEmployeeInfoByStoreId(int storeId);
 }

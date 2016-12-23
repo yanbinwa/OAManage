@@ -3,7 +3,7 @@ angular.module('ionicApp.services', [])
 .factory('WebsocketClient', function() {
 
 	//var SERVER_URL = "ws://localhost:8080/OAManage/websocket/websocketSpring";
-	var SERVER_URL = "wss://10.140.8.37:8443/OAManage/websocket/websocketSpring";
+	var SERVER_URL = "wss://10.140.8.24:8443/OAManage/websocket/websocketSpring";
 	//var SERVER_URL = "wss://192.168.1.103:8443/OAManage/websocket/websocketSpring";
 	var WEBSOCKET_ERROR = 400;
 	var RESPONSE_OK = 200;
@@ -62,6 +62,7 @@ angular.module('ionicApp.services', [])
 		},
 		sessionOnClose: function() {
 			session.connected = false;
+			session.connecting = false;
 			session.client = null;
 		},
 		isReconnecting: function() {
@@ -363,9 +364,10 @@ angular.module('ionicApp.services', [])
 	var listEmployeeTabCtrlUrl = '/listEmployee';
 	var listEmployeeTabCtrl = 'ListEmployeeTabCtrl';
 	
-	var signCtrlUrl = '/employeeSign';
-	var signCtrl = 'EmployeeSignTabCtrl';
-	var signStateName = 'employeeSign';
+	//var signCtrlUrl = '/employeeSign';
+	//var signCtrl = 'EmployeeSignTabCtrl';
+	//var signCtrl = 'EmployeeSignMobileTabCtrl';
+	//var signStateName = 'employeeSign';
 //	var loginCtrlUrl = '/employeeLogin';
 //	var loginCtrl = 'EmployeeLoginTabCtrl';
 //	var loginStateName = 'employeeLogin';
@@ -374,9 +376,9 @@ angular.module('ionicApp.services', [])
 //	var userStateName = 'app.main.userEmployee';
 //	var userStateHref = '#/app/main/userEmployee';
 	
-//	var signCtrlUrl = '/storeSign';
-//	var signCtrl = 'StoreSignTabCtrl';
-//	var signStateName = 'storeSign';
+	var signCtrlUrl = '/storeSign';
+	var signCtrl = 'StoreSignTabCtrl';
+	var signStateName = 'storeSign';
 	var loginCtrlUrl = '/storeLogin';
 	var loginCtrl = 'StoreLoginTabCtrl';
 	var loginStateName = 'storeLogin';

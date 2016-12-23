@@ -28,6 +28,9 @@ public class EmployeeDynamicInfo
     @Column(name = "CHECKINSTATUS", nullable = false)
     private CheckinStatus checkinStatus;
     
+    @Column(name = "CHECKINSTOREID", nullable = false)
+    private int checkinStoreId = -1;
+    
     public EmployeeDynamicInfo()
     {
         
@@ -72,6 +75,16 @@ public class EmployeeDynamicInfo
     public CheckinStatus getCheckinStatus()
     {
         return checkinStatus;
+    }
+    
+    public void setCheckinStoreId(int checkinStoreId)
+    {
+        this.checkinStoreId = checkinStoreId;
+    }
+    
+    public int getCheckinStoreId()
+    {
+        return checkinStoreId;
     }
     
     @Override

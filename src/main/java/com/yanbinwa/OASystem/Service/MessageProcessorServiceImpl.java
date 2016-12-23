@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.TextMessage;
 
 import com.yanbinwa.OASystem.Event.Event;
+import com.yanbinwa.OASystem.Message.CheckinMessageHander;
 import com.yanbinwa.OASystem.Message.LoginMessageHander;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.MessageHander;
@@ -85,6 +86,10 @@ public class MessageProcessorServiceImpl implements MessageProcessorService
         if (messageServiceSpring.isWhatUrl(MessageServiceSpring.LOGIN, message.getUrl()))
         {
             return new LoginMessageHander(message, this);
+        }
+        else if(messageServiceSpring.isWhatUrl(MessageServiceSpring.EMPLOYEE_CHECKIN, message.getUrl()))
+        {
+            return new CheckinMessageHander(message, this);
         }
         return new MessageHander(message, this);
     }

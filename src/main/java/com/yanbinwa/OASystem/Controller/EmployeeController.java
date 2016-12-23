@@ -14,6 +14,8 @@ import com.yanbinwa.OASystem.Model.Employee;
 import com.yanbinwa.OASystem.Service.EmployeeService;
 import com.yanbinwa.OASystem.Service.PropertyService;
 
+import net.sf.json.JSONObject;
+
 @RestController("/employee")
 public class EmployeeController
 {
@@ -49,17 +51,12 @@ public class EmployeeController
         return employee;
     }
     
-    @RequestMapping(value = EMPLOYEE_ROOT_URL + "/employeCheckin", method = RequestMethod.POST, produces = PropertyService.RESPONSE_JSON_UTF8)
-    public @ResponseBody String employeCheckin(@RequestBody Employee employee)
+    @RequestMapping(value = EMPLOYEE_ROOT_URL + "/employeeCheckin", method = RequestMethod.POST, produces = PropertyService.RESPONSE_JSON_UTF8)
+    public @ResponseBody JSONObject employeCheckin(@RequestBody JSONObject payLoad)
     {
-        return employeeService.employeeCheckin(employee);
+        return employeeService.employeeCheckin(payLoad);
     }
     
-    @RequestMapping(value = EMPLOYEE_ROOT_URL + "/employeCheckout", method = RequestMethod.POST, produces = PropertyService.RESPONSE_JSON_UTF8)
-    public @ResponseBody String employeCheckout(@RequestBody Employee employee)
-    {
-        return employeeService.employeeCheckout(employee);
-    }
     
     @RequestMapping(value = EMPLOYEE_ROOT_URL + "/getEmployeeInfoByStoreId/{id}", method = RequestMethod.GET, produces = PropertyService.RESPONSE_JSON_UTF8)
     public @ResponseBody String getEmployeeInfoByStoreId(@PathVariable("id") int id)

@@ -3,5 +3,6 @@ create table employeeDynamicInfo (
    checkinTime BIGINT NOT NULL,
    checkoutTime BIGINT NOT NULL,
    checkinStatus TINYINT NOT NULL,
+   checkinStoreId INT NOT NULL,
    PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

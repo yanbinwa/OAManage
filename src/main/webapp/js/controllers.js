@@ -1,4 +1,4 @@
-angular.module('ionicApp.controllers', ['ionic']);
+angular.module('ionicApp.controllers', ['ionic', 'ionic-datepicker']);
 
 //.controller('MainCtrl', function($scope, $rootScope, $ionicSideMenuDelegate, WebsocketClient, StoreInfo) {
 //
