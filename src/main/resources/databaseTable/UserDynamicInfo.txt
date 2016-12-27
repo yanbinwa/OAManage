@@ -1,4 +1,4 @@
-create table userDynamicInfo (
+create table USERDYNAMICINFO (
    id INT NOT NULL,
    loginTime BIGINT NOT NULL,
    logoutTime BIGINT NOT NULL,

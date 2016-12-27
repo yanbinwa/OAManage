@@ -2,9 +2,10 @@ package com.yanbinwa.OASystem.Service;
 
 public interface PropertyService
 {
-    public static final String SYSTEM_RESOURCE_DIR = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources";
+    public static final String SYSTEM_RESOURCE_DIR = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources/";
+    //public static final String SYSTEM_RESOURCE_DIR = "/opt/apache-tomcat-8.0.28/webapps/OAManage/WEB-INF/classes/";
     
-    public static final String SYSTEM_PROPERTIES_PATH = SYSTEM_RESOURCE_DIR + "/" + "system.properties";
+    public static final String SYSTEM_PROPERTIES_PATH = SYSTEM_RESOURCE_DIR + "system.properties";
     
     public static final String RESPONSE_JSON_UTF8 = "application/json;charset=UTF-8";
     

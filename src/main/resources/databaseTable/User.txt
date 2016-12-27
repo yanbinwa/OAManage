@@ -1,4 +1,4 @@
-create table user (
+create table USER (
    id TINYINT NOT NULL,
    name  VARCHAR(20) NOT NULL,
    password   VARCHAR(10) NOT NULL, 

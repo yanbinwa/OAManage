@@ -1,4 +1,4 @@
-create table employeeDynamicInfo (
+create table EMPLOYEEDYNAMICINFO (
    id INT NOT NULL,
    checkinTime BIGINT NOT NULL,
    checkoutTime BIGINT NOT NULL,

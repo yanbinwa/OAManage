@@ -47,10 +47,10 @@ public interface MessageServiceSpring
     public static final String USERSIGN_ROUTEKEY = "MessageService_UserSign_RouteKey";
     public static final String USERSIGN_FUNCTIONKEY = "MessageService_UserSign_FunctionKey";
     
-    public static final String NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Admin_Employee_File.txt";
-    public static final String NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Normal_Employee_File.txt";
-    public static final String NOTIFY_ADMIN_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Admin_Store_File.txt";
-    public static final String NOTIFY_NORMAL_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "/queueCache/" + "messageService_Normal_Store_File.txt";
+    public static final String NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "queueCache/" + "messageService_Admin_Employee_File.txt";
+    public static final String NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "queueCache/" + "messageService_Normal_Employee_File.txt";
+    public static final String NOTIFY_ADMIN_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "queueCache/" + "messageService_Admin_Store_File.txt";
+    public static final String NOTIFY_NORMAL_STORE_QUEUE_FILENAME = PropertyService.SYSTEM_RESOURCE_DIR + "queueCache/" + "messageService_Normal_Store_File.txt";
     
     public static final String GET_SESSION_ID = "getSessionId";
     

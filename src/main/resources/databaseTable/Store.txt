@@ -1,4 +1,4 @@
-create table store (
+create table STORE (
    id INT NOT NULL,
    userId INT NOT NULL,
    name  VARCHAR(40) NOT NULL,

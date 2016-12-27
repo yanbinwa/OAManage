@@ -1,4 +1,4 @@
-create table employee (
+create table EMPLOYEE (
    id INT NOT NULL,
    userId INT NOT NULL,
    name  VARCHAR(20) NOT NULL,
