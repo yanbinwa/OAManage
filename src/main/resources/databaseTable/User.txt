@@ -1,5 +1,5 @@
 create table USER (
-   id TINYINT NOT NULL,
+   id INT NOT NULL,
    name  VARCHAR(20) NOT NULL,
    password   VARCHAR(10) NOT NULL, 
    userType   TINYINT  NOT NULL,
