@@ -8,6 +8,11 @@ import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
 
 public interface StoreService
 {   
+    public static final String SERVICE_CACHE_KEY = "storeService";
+    public static final String STORE_CACHE_KEY = "store";
+    public static final String STOREDYNAMICINFO_CACHE_KEY = "storeDynamicInfo";
+    public static final String SERVICE_ISCACHE = "Store_isCache";
+    
     public static final String STORE_ID = "id";
     public static final String STORE_NAME = "name";
     public static final String STORE_ADDRESS = "address";
@@ -16,17 +21,19 @@ public interface StoreService
     public static final String STORE_CITY_ID = "cityId";
     public static final String STORE_AREA_ID = "areaId";
     
-    Store findById(int id);
-    
-    void saveStore(Store store);
+    Store findStoreById(int id);
 
+    void saveStore(Store store);
+    
     List<Store> findAllStores();
     
     void deleteStore(Store store);
     
-    Store vailadeAndGetStoreFromPayLoad(Object storeObj);
-    
+    StoreDynamicInfo findStoreDynamicInfoById(int id);
+        
     void saveStoreDynamicInfo(StoreDynamicInfo storeDynamicInfo);
+    
+    Store vailadeAndGetStoreFromPayLoad(Object storeObj);
     
     void signStoreById(int id);
     

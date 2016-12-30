@@ -7,15 +7,24 @@ import com.yanbinwa.OASystem.Model.UserDynamicInfo;
 
 public interface UserService
 {
-    User findByName(String name);
+    public static final String SERVICE_CACHE_KEY = "userService";
+    public static final String USER_CACHE_KEY = "user";
+    public static final String USERDYNAMICINFO_CACHE_KEY = "userDynamicInfo";
+    public static final String SERVICE_ISCACHE = "User_isCache";
     
-    User findById(int id);
+    User findUserByName(String name);
     
     void saveUser(User user);
     
-    void saveUserDynamicInfo(UserDynamicInfo userDynamicInfo);
-    
     List<User> findNoneAuthorizationUser();
+    
+    List<User> findStoreUser();
+    
+    User findUserById(int id);
+        
+    UserDynamicInfo findUserDynamicInfoById(int id);
+    
+    void saveUserDynamicInfo(UserDynamicInfo userDynamicInfo);
     
     String changePassword(int id, String oldPassword, String newPassword);
     

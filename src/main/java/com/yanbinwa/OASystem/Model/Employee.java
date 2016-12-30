@@ -170,6 +170,7 @@ public class Employee
         this.employeeDynamicInfoId = employeeDynamicInfoId;
     }
     
+    
 
     @Override
     public int hashCode() 

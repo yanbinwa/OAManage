@@ -2,9 +2,9 @@ package com.yanbinwa.OASystem.Common;
 
 import net.sf.json.JSONObject;
 
-public interface JsonPersist
+public abstract class JsonPersist
 {
-    public JSONObject getJsonObjectFromObject();
+    public abstract JSONObject getJsonObjectFromObject();
     
-    public void setObjectfromJsonObject(JSONObject jsonObject);
+    public abstract void setObjectfromJsonObject(JSONObject jsonObject);
 }

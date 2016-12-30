@@ -31,7 +31,7 @@ public class StoreController
     @RequestMapping(value = STORE_ROOT_URL + "/getStore/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Store getStoreById(@PathVariable("id") int id)
     {
-        Store store = storeService.findById(id);
+        Store store = storeService.findStoreById(id);
         return store;
     }
     

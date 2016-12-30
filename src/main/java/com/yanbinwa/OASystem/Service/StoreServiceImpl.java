@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import com.yanbinwa.OASystem.Dao.StoreDao;
 import com.yanbinwa.OASystem.Dao.StoreDynamicInfoDao;
 import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
+import com.yanbinwa.OASystem.Utils.CacheUtils;
 
 import net.sf.json.JSONObject;
 
@@ -23,6 +26,7 @@ import net.sf.json.JSONObject;
 public class StoreServiceImpl implements StoreService
 {
     private static final Logger logger = Logger.getLogger(EmployeeServiceImpl.class);
+    private boolean isCache = false;
     
     @Autowired
     private StoreDao storeDao;
@@ -33,23 +37,73 @@ public class StoreServiceImpl implements StoreService
     @Autowired
     private LocationService locationService;
     
+    @Autowired
+    CacheService cacheService;
+    
+    @Autowired
+    private PropertyService propertyService;
+    
     private Map<String, Set<String>> provinceIdToCityIdMap = new HashMap<String, Set<String>>();
     private Map<String, Set<String>> cityIdToAreaIdMap = new HashMap<String, Set<String>>();
     private Map<String, Set<Integer>> areaIdToStoreIdMap = new HashMap<String, Set<Integer>>();
     private Map<Integer, String> storeIdToStoreNameMap = new HashMap<Integer, String>();
     
+    @PostConstruct
+    public void init()
+    {
+        isCache = (Boolean)propertyService.getProperty(SERVICE_ISCACHE, Boolean.class);
+    }
+    
+    /* ------------------- Dao --------------------- */
+    
     @Override
-    public Store findById(int id)
+    public Store findStoreById(int id)
     {
         // TODO Auto-generated method stub
-        return storeDao.findById(id);
+        if (isCache)
+        {
+            return findStoreByIdWithCache(id);
+        }
+        return storeDao.findStoreById(id);
+    }
+    
+    private Store findStoreByIdWithCache(int id)
+    {
+        String key = SERVICE_CACHE_KEY + "_" + STORE_CACHE_KEY + "_" + id;
+        String storeStr = cacheService.getFromCache(key);
+        if (storeStr != null)
+        {
+            Store storeCache = (Store)CacheUtils.convertObjectStrToObject(storeStr, Store.class);
+            return storeCache;
+        }
+        Store store = storeDao.findStoreById(id);
+        if (store == null)
+        {
+            return null;
+        }
+        storeStr = CacheUtils.convertObjectToObjectStr(store);
+        cacheService.putInCache(key, storeStr);
+        return store;
     }
 
     @Override
     public void saveStore(Store store)
     {
         // TODO Auto-generated method stub
+        if (isCache)
+        {
+            saveStoreWithCache(store);
+            return;
+        }
         storeDao.saveStore(store);
+    }
+    
+    private void saveStoreWithCache(Store store)
+    {
+        storeDao.saveStore(store);
+        String key = SERVICE_CACHE_KEY + "_" + STORE_CACHE_KEY + "_" + store.getId();
+        String storeStr = CacheUtils.convertObjectToObjectStr(store);
+        cacheService.putInCache(key, storeStr);
     }
 
     @Override
@@ -63,8 +117,72 @@ public class StoreServiceImpl implements StoreService
     public void deleteStore(Store store)
     {
         // TODO Auto-generated method stub
+        if (isCache)
+        {
+            deleteStoreWithCache(store);
+            return;
+        }
         storeDao.deleteStore(store);
     }
+    
+    private void deleteStoreWithCache(Store store)
+    {
+        storeDao.deleteStore(store);
+        String key = SERVICE_CACHE_KEY + "_" + STORE_CACHE_KEY + "_" + store.getId();
+        cacheService.delInCache(key);
+    }
+    
+    @Override
+    public void saveStoreDynamicInfo(StoreDynamicInfo storeDynamicInfo)
+    {
+        // TODO Auto-generated method stub
+        if (isCache)
+        {
+            saveStoreDynamicInfoWithCache(storeDynamicInfo);
+            return;
+        }
+        storeDynamicInfoDao.saveStoreDynamicInfo(storeDynamicInfo);
+    }
+    
+    private void saveStoreDynamicInfoWithCache(StoreDynamicInfo storeDynamicInfo)
+    {
+        storeDynamicInfoDao.saveStoreDynamicInfo(storeDynamicInfo);
+        String key = SERVICE_CACHE_KEY + "_" + STOREDYNAMICINFO_CACHE_KEY + "_" + storeDynamicInfo.getId();
+        String storeDynamicInfoStr = CacheUtils.convertObjectToObjectStr(storeDynamicInfo);
+        cacheService.putInCache(key, storeDynamicInfoStr);
+    }
+
+    @Override
+    public StoreDynamicInfo findStoreDynamicInfoById(int id)
+    {
+        // TODO Auto-generated method stub
+        if (isCache)
+        {
+            return findStoreDynamicInfoByIdWithCache(id);
+        }
+        return storeDynamicInfoDao.findStoreDynamicInfoById(id);
+    }
+    
+    private StoreDynamicInfo findStoreDynamicInfoByIdWithCache(int id)
+    {
+        String key = SERVICE_CACHE_KEY + "_" + STOREDYNAMICINFO_CACHE_KEY + "_" + id;
+        String storeDynamicInfoStr = cacheService.getFromCache(key);
+        if (storeDynamicInfoStr != null)
+        {
+            StoreDynamicInfo storeDynamicInfoCache = (StoreDynamicInfo)CacheUtils.convertObjectStrToObject(storeDynamicInfoStr, StoreDynamicInfo.class);
+            return storeDynamicInfoCache;
+        }
+        StoreDynamicInfo storeDynamicInfo = storeDynamicInfoDao.findStoreDynamicInfoById(id);
+        if (storeDynamicInfo == null)
+        {
+            return null;
+        }
+        storeDynamicInfoStr = CacheUtils.convertObjectToObjectStr(storeDynamicInfo);
+        cacheService.putInCache(key, storeDynamicInfoStr);
+        return storeDynamicInfo;  
+    }
+    
+    /* ----------------------------------------------------- */
 
     @Override
     public Store vailadeAndGetStoreFromPayLoad(Object storeObj)
@@ -151,17 +269,10 @@ public class StoreServiceImpl implements StoreService
     }
 
     @Override
-    public void saveStoreDynamicInfo(StoreDynamicInfo storeDynamicInfo)
-    {
-        // TODO Auto-generated method stub
-        storeDynamicInfoDao.saveStoreDynamicInfo(storeDynamicInfo);
-    }
-
-    @Override
     public void signStoreById(int id)
     {
         // TODO Auto-generated method stub
-        Store store = storeDao.findById(id);
+        Store store = this.findStoreById(id);
         if (store == null)
         {
             return;
@@ -298,7 +409,7 @@ public class StoreServiceImpl implements StoreService
         {
             return;
         }
-        List<Store> storeList = storeDao.findAllStores();
+        List<Store> storeList = this.findAllStores();
         if (storeList == null)
         {
             return;

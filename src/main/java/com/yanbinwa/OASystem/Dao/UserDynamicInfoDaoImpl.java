@@ -9,7 +9,7 @@ public class UserDynamicInfoDaoImpl extends AbstractDao<Integer, UserDynamicInfo
 {
 
     @Override
-    public UserDynamicInfo findById(int id)
+    public UserDynamicInfo findUserDynamicInfoById(int id)
     {
         // TODO Auto-generated method stub
         return getByKey(id);

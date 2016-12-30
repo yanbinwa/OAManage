@@ -47,7 +47,7 @@ public class LoginServiceImpl implements LoginService
     
     private AtomicInteger atomicUserId;
     private AtomicInteger atomicEmployeeId;
-    private AtomicInteger atomicStoreId = new AtomicInteger(0);
+    private AtomicInteger atomicStoreId;
     
     @PostConstruct
     public void init()
@@ -122,7 +122,7 @@ public class LoginServiceImpl implements LoginService
         JSONObject userJsonObj = (JSONObject)userObj;
         
         String username = userJsonObj.getString(LoginService.USERNAME);
-        User user = userService.findByName(username);
+        User user = userService.findUserByName(username);
         if(user != null)
         {
             return null;
@@ -271,7 +271,7 @@ public class LoginServiceImpl implements LoginService
     {
         // TODO Auto-generated method stub
         String username = payLoad.getString(LoginService.USERNAME);
-        User user = userService.findByName(username);
+        User user = userService.findUserByName(username);
         if (user == null)
         {
             return null;

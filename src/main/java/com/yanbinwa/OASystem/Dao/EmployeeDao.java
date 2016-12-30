@@ -7,7 +7,7 @@ import com.yanbinwa.OASystem.Model.Employee;
 
 public interface EmployeeDao
 {
-    Employee findById(int id);
+    Employee findEmployeeById(int id);
 
     void saveEmployee(Employee employee);
     

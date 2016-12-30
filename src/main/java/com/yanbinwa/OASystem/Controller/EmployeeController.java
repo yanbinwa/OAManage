@@ -33,7 +33,7 @@ public class EmployeeController
     @RequestMapping(value = EMPLOYEE_ROOT_URL + "/getEmployee/{id}", method = RequestMethod.GET, produces = PropertyService.RESPONSE_JSON_UTF8)
     public @ResponseBody Employee getEmployeeById(@PathVariable("id") int id)
     {
-        Employee employee = employeeService.findById(id);
+        Employee employee = employeeService.findEmployeeById(id);
         return employee;
     }
     

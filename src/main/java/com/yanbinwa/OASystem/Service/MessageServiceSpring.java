@@ -5,6 +5,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Model.User;
+import com.yanbinwa.OASystem.Notification.Notification;
 import com.yanbinwa.OASystem.Session.Session;
 import com.yanbinwa.OASystem.Session.Session.SessionType;
 
@@ -64,10 +65,7 @@ public interface MessageServiceSpring
     public boolean isWhatUrl(String urlName, String url);
     public SessionType getSessionTypeFromUser(User user);
     
-    public boolean notifiyAdminEmployeeUser(Message message);
-    public boolean notifiyNormalEmployeeUser(Message message);
-    public boolean notifiyAdminStoreUser(Message message);
-    public boolean notifiyNormalStoreUser(Message message);
+    public boolean notifiyUser(Notification notification, SessionType sessionType);
         
     public boolean isSessionIdOnLine(String sessionId);
     public boolean isSessionExpired(String sessionId);

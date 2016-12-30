@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo.CheckinStatus;
 import com.yanbinwa.OASystem.Model.Store;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.UserState;
+import com.yanbinwa.OASystem.Utils.CacheUtils;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 import net.sf.json.JSONObject;
@@ -27,6 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService
 {
 
     private static final Logger logger = Logger.getLogger(EmployeeServiceImpl.class);
+    private boolean isCache = false;
     
     @Autowired
     private EmployeeDao employeeDao;
@@ -43,18 +47,68 @@ public class EmployeeServiceImpl implements EmployeeService
     @Autowired
     private ORCodeService oRCodeService; 
     
+    @Autowired
+    CacheService cacheService;
+    
+    @Autowired
+    private PropertyService propertyService;
+    
+    @PostConstruct
+    public void init()
+    {
+        isCache = (Boolean)propertyService.getProperty(SERVICE_ISCACHE, Boolean.class);
+    }
+    
+    /* ------------------- Dao --------------------- */
+    
     @Override
-    public Employee findById(int id)
+    public Employee findEmployeeById(int id)
     {
         // TODO Auto-generated method stub
-        return employeeDao.findById(id);
+        if (isCache)
+        {
+            return findEmployeeByIdWithCache(id);
+        }
+        return employeeDao.findEmployeeById(id);
+    }
+    
+    private Employee findEmployeeByIdWithCache(int id)
+    {
+        String key = SERVICE_CACHE_KEY + "_" + EMPLOYEE_CACHE_KEY + "_" + id;
+        String employeeStr = cacheService.getFromCache(key);
+        if (employeeStr != null)
+        {
+            Employee employeeCache = (Employee)CacheUtils.convertObjectStrToObject(employeeStr, Employee.class);
+            return employeeCache;
+        }
+        Employee employee = employeeDao.findEmployeeById(id);
+        if (employee == null)
+        {
+            return null;
+        }
+        employeeStr = CacheUtils.convertObjectToObjectStr(employee);
+        cacheService.putInCache(key, employeeStr);
+        return employee;
     }
 
     @Override
     public void saveEmployee(Employee employee)
     {
         // TODO Auto-generated method stub
+        if (isCache)
+        {
+            saveEmployeeWithCache(employee);
+            return;
+        }
         employeeDao.saveEmployee(employee);
+    }
+    
+    private void saveEmployeeWithCache(Employee employee)
+    {
+        employeeDao.saveEmployee(employee);
+        String key = SERVICE_CACHE_KEY + "_" + EMPLOYEE_CACHE_KEY + "_" + employee.getId();
+        String employeeStr = CacheUtils.convertObjectToObjectStr(employee);
+        cacheService.putInCache(key, employeeStr);
     }
 
     @Override
@@ -68,8 +122,79 @@ public class EmployeeServiceImpl implements EmployeeService
     public void deleteEmployee(Employee employee)
     {
         // TODO Auto-generated method stub
+        if (isCache)
+        {
+            deleteEmployeeWithCache(employee);
+            return;
+        }
         employeeDao.deleteEmployee(employee);
     }
+    
+    private void deleteEmployeeWithCache(Employee employee)
+    {
+        employeeDao.deleteEmployee(employee);
+        String key = SERVICE_CACHE_KEY + "_" + EMPLOYEE_CACHE_KEY + "_" + employee.getId();
+        cacheService.delInCache(key);
+    }
+    
+    @Override
+    public List<Employee> findEmployeesByStoreId(int storeId)
+    {
+        // TODO Auto-generated method stub
+        return employeeDao.findEmployeesByStoreId(storeId);
+    }
+     
+    @Override
+    public EmployeeDynamicInfo findEmployeeDynamicInfoById(int id)
+    {
+        // TODO Auto-generated method stub
+        if (isCache)
+        {
+            return findEmployeeDynamicInfoByIdWithCache(id);
+        }
+        return employeeDynamicInfoDao.findEmployeeDynamicInfoById(id);
+    }
+    
+    private EmployeeDynamicInfo findEmployeeDynamicInfoByIdWithCache(int id)
+    {
+        String key = SERVICE_CACHE_KEY + "_" + EMPLOYEEDYNAMICINFO_CACHE_KEY + "_" + id;
+        String employeeDynamicInfoStr = cacheService.getFromCache(key);
+        if (employeeDynamicInfoStr != null)
+        {
+            EmployeeDynamicInfo employeeDynamicInfoCache = (EmployeeDynamicInfo)CacheUtils.convertObjectStrToObject(employeeDynamicInfoStr, EmployeeDynamicInfo.class);
+            return employeeDynamicInfoCache;
+        }
+        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findEmployeeDynamicInfoById(id);
+        if (employeeDynamicInfo == null)
+        {
+            return null;
+        }
+        employeeDynamicInfoStr = CacheUtils.convertObjectToObjectStr(employeeDynamicInfo);
+        cacheService.putInCache(key, employeeDynamicInfoStr);
+        return employeeDynamicInfo;        
+    }
+    
+    @Override
+    public void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo)
+    {
+        // TODO Auto-generated method stub
+        if (isCache)
+        {
+            saveEmployeeDynamicInfoWithCache(employeeDynamicInfo);
+            return;
+        }
+        employeeDynamicInfoDao.saveEmployeeDynamicInfo(employeeDynamicInfo);
+    }
+    
+    private void saveEmployeeDynamicInfoWithCache(EmployeeDynamicInfo employeeDynamicInfo)
+    {
+        employeeDynamicInfoDao.saveEmployeeDynamicInfo(employeeDynamicInfo);
+        String key = SERVICE_CACHE_KEY + "_" + EMPLOYEEDYNAMICINFO_CACHE_KEY + "_" + employeeDynamicInfo.getId();
+        String employeeDynamicInfoStr = CacheUtils.convertObjectToObjectStr(employeeDynamicInfo);
+        cacheService.putInCache(key, employeeDynamicInfoStr);
+    }
+    
+    /** ---------------------------------------------- */
 
     @Override
     public Employee vailadeAndGetEmployeeFromPayLoad(Object employeeObj)
@@ -120,13 +245,6 @@ public class EmployeeServiceImpl implements EmployeeService
         
         return employee;
     }
-
-    @Override
-    public void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo)
-    {
-        // TODO Auto-generated method stub
-        employeeDynamicInfoDao.saveEmployeeDynamicInfo(employeeDynamicInfo);
-    }
     
     @Override
     public JSONObject employeeCheckin(JSONObject payLoad)
@@ -160,7 +278,7 @@ public class EmployeeServiceImpl implements EmployeeService
         }
         
         int storeId = Integer.valueOf(barcodeStrList[1]);
-        Store store = storeService.findById(storeId);
+        Store store = storeService.findStoreById(storeId);
         if (store == null)
         {
             response.put(RESPONSE_PAYLOAD, "store is invaild");
@@ -168,13 +286,13 @@ public class EmployeeServiceImpl implements EmployeeService
         }
         
         int employeeId = payLoad.getInt(EMPLOYEE_ID);
-        Employee employee = employeeDao.findById(employeeId);
+        Employee employee = this.findEmployeeById(employeeId);
         if (employee == null)
         {
             response.put(RESPONSE_PAYLOAD, "employee is not find");
             return response;
         }
-        EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employee.getEmployeeDynamicInfoId());
+        EmployeeDynamicInfo employeeDynamicInfo = this.findEmployeeDynamicInfoById(employee.getEmployeeDynamicInfoId());
         if (employeeDynamicInfo == null)
         {
             response.put(RESPONSE_PAYLOAD, "employee dynamic info is not find");
@@ -220,7 +338,7 @@ public class EmployeeServiceImpl implements EmployeeService
             }
             else
             {
-                storeName = storeService.findById(storeId).getName();
+                storeName = storeService.findStoreById(storeId).getName();
             }
             response.put(RESPONSE_PAYLOAD, "Has already checkin at " + storeName);
             return response;
@@ -254,7 +372,7 @@ public class EmployeeServiceImpl implements EmployeeService
     {
         // TODO Auto-generated method stub
         Map<String, Map<String, Object>> employeeInfoMap = new HashMap<String, Map<String, Object>>();
-        List<Employee> employees = employeeDao.findEmployeesByStoreId(storeId);
+        List<Employee> employees = this.findEmployeesByStoreId(storeId);
         if(employees == null)
         {
             return JSONObject.fromObject(employeeInfoMap).toString();
@@ -262,7 +380,7 @@ public class EmployeeServiceImpl implements EmployeeService
         for(Employee employee : employees)
         {
             int userId = employee.getUserId();
-            User user = userService.findById(userId);
+            User user = userService.findUserById(userId);
             if (user == null)
             {
                 logger.error("getEmployeeInfoByStoreId failed by userId: " + userId);
@@ -273,7 +391,7 @@ public class EmployeeServiceImpl implements EmployeeService
                 continue;
             }
             int employeeDynamicInfoId = employee.getEmployeeDynamicInfoId();
-            EmployeeDynamicInfo employeeDynamicInfo = employeeDynamicInfoDao.findById(employeeDynamicInfoId);
+            EmployeeDynamicInfo employeeDynamicInfo = this.findEmployeeDynamicInfoById(employeeDynamicInfoId);
             if (employeeDynamicInfo == null)
             {
                 logger.error("getEmployeeInfoByStoreId failed by employeeDynamicInfoId: " + employeeDynamicInfoId);
@@ -293,5 +411,4 @@ public class EmployeeServiceImpl implements EmployeeService
         
         return JSONObject.fromObject(employeeInfoMap).toString();
     }
-
 }

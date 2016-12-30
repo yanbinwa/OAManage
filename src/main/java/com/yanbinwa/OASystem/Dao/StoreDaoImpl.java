@@ -12,7 +12,7 @@ public class StoreDaoImpl extends AbstractDao<Integer, Store> implements StoreDa
 {
 
     @Override
-    public Store findById(int id)
+    public Store findStoreById(int id)
     {
         // TODO Auto-generated method stub
         return getByKey(id);

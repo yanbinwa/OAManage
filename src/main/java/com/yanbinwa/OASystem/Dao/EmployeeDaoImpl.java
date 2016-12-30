@@ -13,7 +13,7 @@ public class EmployeeDaoImpl extends AbstractDao<Integer, Employee> implements E
 {
 
     @Override
-    public Employee findById(int id)
+    public Employee findEmployeeById(int id)
     {
         // TODO Auto-generated method stub
         return getByKey(id);

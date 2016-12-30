@@ -15,7 +15,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao
 {
 
     @Override
-    public User findByName(String name)
+    public User findUserByName(String name)
     {
         // TODO Auto-generated method stub
         Criteria criteria = createEntityCriteria();
@@ -41,7 +41,7 @@ public class UserDaoImpl extends AbstractDao<Integer, User> implements UserDao
     }
 
     @Override
-    public User findById(int id)
+    public User findUserById(int id)
     {
         // TODO Auto-generated method stub
         return getByKey(id);

@@ -1,12 +1,23 @@
 package com.yanbinwa.OASystem.Utils;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
+import com.yanbinwa.OASystem.Common.JsonPersist;
 import com.yanbinwa.OASystem.Message.Message;
+import com.yanbinwa.OASystem.Notification.Notification;
+import com.yanbinwa.OASystem.QueuePersist.AppendAction.QueueAction;
+import com.yanbinwa.OASystem.QueuePersist.PersistBlockQueue;
+import com.yanbinwa.OASystem.Service.QueuePersistService;
+import com.yanbinwa.OASystem.Service.QueuePersistServiceImpl;
 
 public class QueuePersistUtilTest
 {
+    
+    public static Notification getNotification()
+    {
+        Notification notification = new Notification();
+        notification.setExpiredTime(1000);
+        notification.setMessage(getMessage());
+        return notification;
+    }
     
     public static Message getMessage()
     {
@@ -20,21 +31,31 @@ public class QueuePersistUtilTest
     
     public static void main(String[] args)
     {
-        BlockingQueue<Message> queue = new ArrayBlockingQueue<Message>(10);
-        String filename = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources/TestQueuePersist.txt";
-                
+//        BlockingQueue<Notification> queue = new ArrayBlockingQueue<Notification>(10);
+//        String filename = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources/queueCache/TestQueuePersist.txt";
+//                
+//        for(int i = 0; i < 10; i ++)
+//        {
+//            queue.add(getNotification());
+//        }
+//        
+//        QueuePersistUtil.persistQueueSnapshot(queue, Notification.class, filename);
+//        
+//        queue.clear();
+//        
+//        QueuePersistUtil.loadQueueSnapshot(queue, Notification.class, filename);
+//        
+//        System.out.println(queue);
+        String filename = "/Users/yanbinwa/Documents/workspace/OAManage/src/main/resources/queueCache/TestQueuePersist.txt";
+        PersistBlockQueue<JsonPersist> queue = new PersistBlockQueue<JsonPersist>(30, Notification.class, filename);
+        
+        QueuePersistService service = new QueuePersistServiceImpl();
+        service.registerQueue(queue, Notification.class, filename);
         for(int i = 0; i < 10; i ++)
         {
-            queue.add(getMessage());
+            service.appendAction(getNotification(), QueueAction.PUSH, filename);
         }
-        
-        QueuePersistUtil.persistQueue(queue, Message.class, filename);
-        
-        queue.clear();
-        
-        QueuePersistUtil.loadQueue(queue, Message.class, filename);
-        
+        service.loadQueue(filename);
         System.out.println(queue);
-        
     }
 }

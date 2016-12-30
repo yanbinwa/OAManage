@@ -96,5 +96,4 @@ public class EmployeeDynamicInfo
             .append("checkinStatus = " + checkinStatus);
         return buf.toString();
     }
-    
 }

@@ -6,7 +6,7 @@ import com.yanbinwa.OASystem.Model.Store;
 
 public interface StoreDao
 {
-    Store findById(int id);
+    Store findStoreById(int id);
 
     void saveStore(Store store);
     

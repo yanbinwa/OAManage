@@ -29,8 +29,9 @@ angular.module('ionicApp.controllers')
         payLoad.password = $scope.user.password;
         payLoad.userType = "employee";
         payLoad.authType = $scope.user.auth;
-        userLogin(payLoad);
-        
+        if (validateLoginPayload(payLoad)) {
+        	userLogin(payLoad);
+        }
     }
     $scope.sign = function() {
         $state.go(URL.getSignStateName());
@@ -40,6 +41,18 @@ angular.module('ionicApp.controllers')
 		msg.routeKey = 'EmployeeLoginTabCtrl';
 		$scope.$emit("MainCtrl", msg);
 	}
+    
+    var validateLoginPayload = function(payLoad) {
+    	if (payLoad.username == null) {
+    		alert("用户名不能为空");
+    		return false;
+    	}
+    	if (payLoad.password == null) {
+    		alert("密码不能为空");
+    		return false;
+    	}
+    	return true;
+    }
     
     var userLogin = function(payLoad) {
     	var data = {

@@ -9,6 +9,11 @@ import net.sf.json.JSONObject;
 
 public interface EmployeeService
 {
+    public static final String SERVICE_CACHE_KEY = "employeeService";
+    public static final String EMPLOYEE_CACHE_KEY = "employee";
+    public static final String EMPLOYEEDYNAMICINFO_CACHE_KEY = "employeeDynamicInfo";
+    public static final String SERVICE_ISCACHE = "Employee_isCache";
+    
     public static final String EMPLOYEE_ID = "id";
     public static final String EMPLOYEE_NAME = "name";
     public static final String EMPLOYEE_SEX = "sex";
@@ -24,7 +29,7 @@ public interface EmployeeService
     public static final String RESPONSE_STATE = "responseState";
     public static final String RESPONSE_PAYLOAD = "responsePayload";
     
-    Employee findById(int id);
+    Employee findEmployeeById(int id);
     
     void saveEmployee(Employee employee);
 
@@ -32,9 +37,13 @@ public interface EmployeeService
     
     void deleteEmployee(Employee employee);
     
-    Employee vailadeAndGetEmployeeFromPayLoad(Object employeeObj);
+    EmployeeDynamicInfo findEmployeeDynamicInfoById(int id);
     
+    List<Employee> findEmployeesByStoreId(int storeId);
+        
     void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo);
+    
+    Employee vailadeAndGetEmployeeFromPayLoad(Object employeeObj);
     
     JSONObject employeeCheckin(JSONObject payLoad);
             

@@ -7,7 +7,7 @@ import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 import net.sf.json.JSONObject;
 
-public class Message implements JsonPersist
+public class Message extends JsonPersist
 {
     public enum MessageHttpMethod 
     {

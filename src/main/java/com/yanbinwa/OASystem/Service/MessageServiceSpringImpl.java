@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
@@ -22,15 +20,18 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.yanbinwa.OASystem.Common.EventListener;
+import com.yanbinwa.OASystem.Common.JsonPersist;
 import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Message.Message.MessageHttpMethod;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.AuthType;
 import com.yanbinwa.OASystem.Model.User.UserType;
+import com.yanbinwa.OASystem.Notification.Notification;
+import com.yanbinwa.OASystem.QueuePersist.AppendAction.QueueAction;
+import com.yanbinwa.OASystem.QueuePersist.PersistBlockQueue;
 import com.yanbinwa.OASystem.Session.Session;
 import com.yanbinwa.OASystem.Session.Session.SessionType;
-import com.yanbinwa.OASystem.Utils.QueuePersistUtil;
 
 import net.sf.json.JSONObject;
 
@@ -53,10 +54,10 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     
     private static final Logger logger = Logger.getLogger(MessageServiceSpringImpl.class);
     
-    private BlockingQueue<Message> notifyAdminEmployeeQueue;
-    private BlockingQueue<Message> notifyNormalEmployeeQueue;
-    private BlockingQueue<Message> notifyAdminStoreQueue;
-    private BlockingQueue<Message> notifyNormalStoreQueue;
+    private PersistBlockQueue<JsonPersist> notifyAdminEmployeeQueue;
+    private PersistBlockQueue<JsonPersist> notifyNormalEmployeeQueue;
+    private PersistBlockQueue<JsonPersist> notifyAdminStoreQueue;
+    private PersistBlockQueue<JsonPersist> notifyNormalStoreQueue;
     private ThreadPoolTaskExecutor poolTaskExecutor;
         
     @Autowired
@@ -70,6 +71,9 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     
     @Autowired
     private WebsocketMessageProcessorService websocketMessageProcessorService;
+    
+    @Autowired
+    private QueuePersistService queuePersistService;
         
     @PostConstruct
     public void init()
@@ -95,15 +99,26 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         poolTaskExecutor.setKeepAliveSeconds((Integer)propertyService.getProperty(KEEP_ALIVE_SECONDS, Integer.class));
         poolTaskExecutor.initialize();
         
-        notifyAdminEmployeeQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyAdminEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
-        notifyNormalEmployeeQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyNormalEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
-        notifyAdminStoreQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyAdminStoreQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
-        notifyNormalStoreQueue = new ArrayBlockingQueue<Message>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_SIZE, Integer.class));
-        QueuePersistUtil.loadQueue(notifyNormalStoreQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);
+        notifyAdminEmployeeQueue = new PersistBlockQueue<JsonPersist>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_SIZE, Integer.class), 
+                                            Notification.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);       
+        queuePersistService.registerQueue(notifyAdminEmployeeQueue, Notification.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
+        queuePersistService.loadQueue(MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
         
+        notifyNormalEmployeeQueue = new PersistBlockQueue<JsonPersist>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_SIZE, Integer.class), 
+                                            Notification.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
+        queuePersistService.registerQueue(notifyNormalEmployeeQueue, Notification.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
+        queuePersistService.loadQueue(MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
+        
+        notifyAdminStoreQueue = new PersistBlockQueue<JsonPersist>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_SIZE, Integer.class), 
+                                            Notification.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
+        queuePersistService.registerQueue(notifyAdminStoreQueue, Notification.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
+        queuePersistService.loadQueue(MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
+
+        notifyNormalStoreQueue = new PersistBlockQueue<JsonPersist>((Integer)propertyService.getProperty(MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_SIZE, Integer.class), 
+                                            Notification.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);
+        queuePersistService.registerQueue(notifyNormalStoreQueue, Notification.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);
+        queuePersistService.loadQueue(MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);
+                
         new Thread(new Runnable() {
 
             @Override
@@ -163,10 +178,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     @PreDestroy
     public void destroy()
     {
-        QueuePersistUtil.persistQueue(notifyAdminEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_EMPLOYEE_QUEUE_FILENAME);
-        QueuePersistUtil.persistQueue(notifyNormalEmployeeQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_EMPLOYEE_QUEUE_FILENAME);
-        QueuePersistUtil.persistQueue(notifyAdminStoreQueue, Message.class, MessageServiceSpring.NOTIFY_ADMIN_STORE_QUEUE_FILENAME);
-        QueuePersistUtil.persistQueue(notifyNormalStoreQueue, Message.class, MessageServiceSpring.NOTIFY_NORMAL_STORE_QUEUE_FILENAME);        
+
     }
     
     @Override
@@ -531,52 +543,99 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     }
 
     @Override
-    public boolean notifiyAdminEmployeeUser(Message message)
+    public boolean notifiyUser(Notification notification, SessionType sessionType)
     {
         // TODO Auto-generated method stub
-        return notifyAdminEmployeeQueue.add(message);
-    }
-
-    @Override
-    public boolean notifiyNormalEmployeeUser(Message message)
-    {
-        // TODO Auto-generated method stub
-        return notifyNormalEmployeeQueue.add(message);
+        boolean ret = false;
+        switch(sessionType)
+        {
+        case AdminStoreSession:
+            ret = notifyAdminStoreQueue.offer(notification);
+            queuePersistService.appendAction(notification, QueueAction.PUSH, notifyAdminStoreQueue.getFilename());
+            break;
+        case AdminEmployeeSession:
+            ret = notifyAdminEmployeeQueue.offer(notification);
+            queuePersistService.appendAction(notification, QueueAction.PUSH, notifyAdminEmployeeQueue.getFilename());
+            break;
+        case NormalStoreSession:
+            ret = notifyNormalStoreQueue.offer(notification);
+            queuePersistService.appendAction(notification, QueueAction.PUSH, notifyNormalStoreQueue.getFilename());
+            break;
+        case NormalEmployeeSession:
+            ret = notifyNormalEmployeeQueue.offer(notification);
+            queuePersistService.appendAction(notification, QueueAction.PUSH, notifyNormalEmployeeQueue.getFilename());
+            break;
+        default:
+            break;
+        }
+        return ret;
     }
     
-    @Override
-    public boolean notifiyAdminStoreUser(Message message)
+    private boolean notifiyUserCancel(Notification notification, SessionType sessionType)
     {
-        // TODO Auto-generated method stub
-        return notifyAdminStoreQueue.add(message);
+        boolean ret = false;
+        switch(sessionType)
+        {
+        case AdminStoreSession:
+            ret = notifyAdminStoreQueue.cancelPoll(notification);
+            break;
+        case AdminEmployeeSession:
+            ret = notifyAdminEmployeeQueue.cancelPoll(notification);
+            break;
+        case NormalStoreSession:
+            ret = notifyNormalStoreQueue.cancelPoll(notification);
+            break;
+        case NormalEmployeeSession:
+            ret = notifyNormalEmployeeQueue.cancelPoll(notification);
+            break;
+        default:
+            break;
+        }
+        return ret;
     }
     
-    @Override
-    public boolean notifiyNormalStoreUser(Message message)
+    private boolean notifiyUserCommit(Notification notification, SessionType sessionType)
     {
-        // TODO Auto-generated method stub
-        return notifyNormalStoreQueue.add(message);
+        boolean ret = false;
+        switch(sessionType)
+        {
+        case AdminStoreSession:
+            ret = notifyAdminStoreQueue.commitPoll(notification);
+            queuePersistService.appendAction(notification, QueueAction.POLL, notifyAdminStoreQueue.getFilename());
+            break;
+        case AdminEmployeeSession:
+            ret = notifyAdminEmployeeQueue.commitPoll(notification);
+            queuePersistService.appendAction(notification, QueueAction.POLL, notifyAdminStoreQueue.getFilename());
+            break;
+        case NormalStoreSession:
+            ret = notifyNormalStoreQueue.commitPoll(notification);
+            queuePersistService.appendAction(notification, QueueAction.POLL, notifyAdminStoreQueue.getFilename());
+            break;
+        case NormalEmployeeSession:
+            ret = notifyNormalEmployeeQueue.commitPoll(notification);
+            queuePersistService.appendAction(notification, QueueAction.POLL, notifyAdminStoreQueue.getFilename());
+            break;
+        default:
+            break;
+        }
+        return ret;
     }
-    
+        
     private void notifyAdminEmployeeUser()
     {
         while(true)
         {
-            Message message = null;
-            try
-            {
-                message = notifyAdminEmployeeQueue.poll(1000, TimeUnit.MILLISECONDS);
-            } 
-            catch (InterruptedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if(message == null)
+            Notification notification = null;
+            notification = (Notification)notifyAdminEmployeeQueue.pollWithoutCommit(1000, TimeUnit.MILLISECONDS);
+            if(notification == null)
             {
                 continue;
             }
-            NotifyAdminEmployeeUserHelper notifyAdminEmployeeUserHelper = new NotifyAdminEmployeeUserHelper(message);
+            if(notification.isExpired())
+            {
+                continue;
+            }
+            NotifyUserHelper notifyAdminEmployeeUserHelper = new NotifyUserHelper(notification, SessionType.AdminEmployeeSession);
             poolTaskExecutor.execute(notifyAdminEmployeeUserHelper);
         }
     }
@@ -585,21 +644,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     {
         while(true)
         {
-            Message message = null;
-            try
-            {
-                message = notifyNormalEmployeeQueue.poll(1000, TimeUnit.MILLISECONDS);
-            } 
-            catch (InterruptedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if(message == null)
+            Notification notification = null;
+            notification = (Notification)notifyNormalEmployeeQueue.pollWithoutCommit(1000, TimeUnit.MILLISECONDS);
+            if(notification == null)
             {
                 continue;
             }
-            NotifyNormalEmployeeUserHelper notifyNormalUserHelper = new NotifyNormalEmployeeUserHelper(message);
+            if(notification.isExpired())
+            {
+                continue;
+            }
+            NotifyUserHelper notifyNormalUserHelper = new NotifyUserHelper(notification, SessionType.NormalEmployeeSession);
             poolTaskExecutor.execute(notifyNormalUserHelper);
         }
     }
@@ -608,21 +663,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     {
         while(true)
         {
-            Message message = null;
-            try
-            {
-                message = notifyAdminStoreQueue.poll(1000, TimeUnit.MILLISECONDS);
-            } 
-            catch (InterruptedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if(message == null)
+            Notification notification = null;
+            notification = (Notification)notifyAdminStoreQueue.pollWithoutCommit(1000, TimeUnit.MILLISECONDS);
+            if(notification == null)
             {
                 continue;
             }
-            NotifyAdminStoreUserHelper notifyAdminStoreUserHelper = new NotifyAdminStoreUserHelper(message);
+            if(notification.isExpired())
+            {
+                continue;
+            }
+            NotifyUserHelper notifyAdminStoreUserHelper = new NotifyUserHelper(notification, SessionType.AdminStoreSession);
             poolTaskExecutor.execute(notifyAdminStoreUserHelper);
         }
     }
@@ -631,21 +682,17 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
     {
         while(true)
         {
-            Message message = null;
-            try
-            {
-                message = notifyNormalStoreQueue.poll(1000, TimeUnit.MILLISECONDS);
-            } 
-            catch (InterruptedException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            if(message == null)
+            Notification notification = null;
+            notification = (Notification)notifyNormalStoreQueue.pollWithoutCommit(1000, TimeUnit.MILLISECONDS);
+            if(notification == null)
             {
                 continue;
             }
-            NotifyNormalStoreUserHelper notifyNormalStoreUserHelper = new NotifyNormalStoreUserHelper(message);
+            if(notification.isExpired())
+            {
+                continue;
+            }
+            NotifyUserHelper notifyNormalStoreUserHelper = new NotifyUserHelper(notification, SessionType.NormalStoreSession);
             poolTaskExecutor.execute(notifyNormalStoreUserHelper);
         }
     }
@@ -683,30 +730,31 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
         
     }
     
-    class NotifyAdminEmployeeUserHelper implements Runnable
+    class NotifyUserHelper implements Runnable
     {
+
+        Notification notification;
+        SessionType sessionType;
         
-        Message message;
-        
-        public NotifyAdminEmployeeUserHelper(Message message)
+        public NotifyUserHelper(Notification notification, SessionType sessionType)
         {
-            this.message = message;
+            this.notification = notification;
+            this.sessionType = sessionType;
         }
         
         @Override
         public void run()
         {
             // TODO Auto-generated method stub
-            // find all session for adminUser and send the message
-            Set<Session> adminEmployeeSession = sessionTypeToSessionMap.get(SessionType.AdminEmployeeSession);
-            if (adminEmployeeSession == null || adminEmployeeSession.isEmpty())
+            Set<Session> userSession = sessionTypeToSessionMap.get(sessionType);
+            if (userSession == null || userSession.isEmpty())
             {
                 try
                 {
-                    Thread.sleep(5000);
-                    if (adminEmployeeSession == null || adminEmployeeSession.isEmpty())
+                    Thread.sleep(1000);
+                    if (userSession == null || userSession.isEmpty())
                     {
-                        notifiyAdminEmployeeUser(message);
+                        notifiyUserCancel(notification, sessionType);
                         return;
                     }
                 } 
@@ -716,8 +764,8 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
                     e.printStackTrace();
                 }
             }
-            TextMessage returnMessage = new TextMessage(message.getResponseJsonStr());
-            for(Session session : adminEmployeeSession)
+            TextMessage returnMessage = new TextMessage(notification.getMessage().getResponseJsonStr());
+            for(Session session : userSession)
             {
                 try
                 {
@@ -729,95 +777,7 @@ public class MessageServiceSpringImpl implements MessageServiceSpring, EventList
                     e.printStackTrace();
                 }
             }
-        }
-    }
-    
-    class NotifyNormalEmployeeUserHelper implements Runnable
-    {
-        
-        Message message;
-        
-        public NotifyNormalEmployeeUserHelper(Message message)
-        {
-            this.message = message;
-        }
-        
-        @Override
-        public void run()
-        {
-            // TODO Auto-generated method stub
-            // find all session for adminUser or normalUser and send the message
-            
-        }
-        
-    }
-    
-    class NotifyAdminStoreUserHelper implements Runnable
-    {
-        
-        Message message;
-        
-        public NotifyAdminStoreUserHelper(Message message)
-        {
-            this.message = message;
-        }
-        
-        @Override
-        public void run()
-        {
-            // TODO Auto-generated method stub
-            // find all session for adminUser and send the message
-            Set<Session> adminStoreSession = sessionTypeToSessionMap.get(SessionType.AdminStoreSession);
-            if (adminStoreSession == null || adminStoreSession.isEmpty())
-            {
-                try
-                {
-                    Thread.sleep(5000);
-                    if (adminStoreSession == null || adminStoreSession.isEmpty())
-                    {
-                        notifiyAdminStoreUser(message);
-                        return;
-                    }
-                } 
-                catch (InterruptedException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            TextMessage returnMessage = new TextMessage(message.getResponseJsonStr());
-            for(Session session : adminStoreSession)
-            {
-                try
-                {
-                    session.getWebSocketSession().sendMessage(returnMessage);
-                } 
-                catch (IOException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        
-    }
-    
-    class NotifyNormalStoreUserHelper implements Runnable
-    {
-        
-        Message message;
-        
-        public NotifyNormalStoreUserHelper(Message message)
-        {
-            this.message = message;
-        }
-        
-        @Override
-        public void run()
-        {
-            // TODO Auto-generated method stub
-            // find all session for adminUser or normalUser and send the message
-            
+            notifiyUserCommit(notification, sessionType);
         }
         
     }

@@ -6,7 +6,7 @@ import com.yanbinwa.OASystem.Model.User;
 
 public interface UserDao
 {
-    User findByName(String name);
+    User findUserByName(String name);
     
     void saveUser(User user);
     
@@ -14,5 +14,5 @@ public interface UserDao
     
     List<User> findStoreUser();
     
-    User findById(int id);
+    User findUserById(int id);
 }

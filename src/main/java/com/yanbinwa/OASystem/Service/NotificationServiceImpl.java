@@ -3,9 +3,9 @@ package com.yanbinwa.OASystem.Service;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,8 @@ import com.yanbinwa.OASystem.Event.Event;
 import com.yanbinwa.OASystem.Message.Message;
 import com.yanbinwa.OASystem.Model.User;
 import com.yanbinwa.OASystem.Model.User.UserType;
+import com.yanbinwa.OASystem.Notification.Notification;
+import com.yanbinwa.OASystem.Session.Session.SessionType;
 import com.yanbinwa.OASystem.Utils.HttpUtils;
 
 import net.sf.json.JSONObject;
@@ -45,11 +47,16 @@ public class NotificationServiceImpl implements NotificationService, EventListen
     private ThreadPoolTaskExecutor poolTaskExecutor;
     private BlockingQueue<Event> eventQueue;
     
+    private AtomicLong atomicNotificationId;
+    
     @PostConstruct
     public void init()
     {
         String[] keys = {EventService.NOTIFICATION_SERVICE};
         eventService.register(this, keys);
+        
+        long notificationIdBak = (Long) propertyService.getLocalProperty(NOTIFICATION_ID_BAK, Long.class, 0);
+        atomicNotificationId = new AtomicLong(notificationIdBak);
         
         poolTaskExecutor = new ThreadPoolTaskExecutor();
         poolTaskExecutor.setQueueCapacity((Integer)propertyService.getProperty(QUEUE_CAPACITY, Integer.class));
@@ -72,10 +79,20 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         }).start();
     }
     
-    @PreDestroy
-    public void destroy()
+    private long getNoficationId()
     {
-        
+        long notificationId = atomicNotificationId.getAndIncrement();
+        propertyService.setLocalProperty(NOTIFICATION_ID_BAK, atomicNotificationId, Integer.class);
+        return notificationId;
+    }
+    
+    private Notification getNotification(Message message, int expiredTime)
+    {
+        Notification notification = new Notification();
+        notification.setMessage(message);
+        notification.setExpiredTime(expiredTime);
+        notification.setId(getNoficationId());
+        return notification;
     }
     
     private void handleEvent()
@@ -131,11 +148,11 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         Object userObject = null;
         if (userType == UserType.Employee)
         {
-            userObject = employeeService.findById(userId);
+            userObject = employeeService.findEmployeeById(userId);
         }
         else if(userType == UserType.Store)
         {
-            userObject = storeService.findById(userId);
+            userObject = storeService.findStoreById(userId);
         }
         if (userObject == null)
         {
@@ -157,7 +174,9 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         message.setResponseCode(responseCode);
         message.setResponsePayLoad(jsonObj.toString());
         
-        boolean ret = messageServiceSpring.notifiyAdminStoreUser(message);
+        Notification notification = getNotification(message, NOTIFICATION_NEVER_EXPIRED_TIME);
+        
+        boolean ret = messageServiceSpring.notifiyUser(notification, SessionType.AdminStoreSession);
         if (!ret)
         {
             logger.error("Can not notify the message");
@@ -180,17 +199,14 @@ public class NotificationServiceImpl implements NotificationService, EventListen
         message.setFunctionKey(functionKey);
         message.setResponseCode(responseCode);
         message.setResponsePayLoad(oRCodeKey);
-        boolean ret = messageServiceSpring.notifiyAdminStoreUser(message);
+        
+        Notification notification = getNotification(message, NOTIFICATION_QUICK_EXPIRED_TIME);
+        
+        boolean ret = messageServiceSpring.notifiyUser(notification, SessionType.AdminStoreSession);
         if (!ret)
         {
             logger.error("Can not send the ORCode update message to admin");
         }
-        ret = messageServiceSpring.notifiyNormalStoreUser(message);
-        if (!ret)
-        {
-            logger.error("Can not send the ORCode update message to normal");
-        }
-        
     }
     
     @Override

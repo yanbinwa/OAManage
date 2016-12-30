@@ -8,7 +8,7 @@ import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
 public class StoreDynamicInfoDaoImpl extends AbstractDao<Integer, StoreDynamicInfo> implements StoreDynamicInfoDao
 {
     @Override
-    public StoreDynamicInfo findById(int id)
+    public StoreDynamicInfo findStoreDynamicInfoById(int id)
     {
         // TODO Auto-generated method stub
         return getByKey(id);

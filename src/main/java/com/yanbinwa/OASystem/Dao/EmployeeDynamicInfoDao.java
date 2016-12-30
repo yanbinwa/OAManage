@@ -4,7 +4,7 @@ import com.yanbinwa.OASystem.Model.EmployeeDynamicInfo;
 
 public interface EmployeeDynamicInfoDao
 {
-    EmployeeDynamicInfo findById(int id);
+    EmployeeDynamicInfo findEmployeeDynamicInfoById(int id);
     
     void saveEmployeeDynamicInfo(EmployeeDynamicInfo employeeDynamicInfo);
 }

@@ -7,7 +7,7 @@ import com.yanbinwa.OASystem.Model.StoreDynamicInfo;
 @Repository("storeDynamicInfoDao")
 public interface StoreDynamicInfoDao
 {
-    StoreDynamicInfo findById(int id);
+    StoreDynamicInfo findStoreDynamicInfoById(int id);
     
     void saveStoreDynamicInfo(StoreDynamicInfo storeDynamicInfo);
 }
